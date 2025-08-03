@@ -8,6 +8,7 @@ import 'package:looli_app/Models/songs.dart';
 import 'package:looli_app/services/Liked_songs_service.dart';
 import 'package:looli_app/widgets/audio_manager.dart';
 import 'package:looli_app/services/queue_service.dart';
+import 'package:looli_app/widgets/up_next_drawer.dart'; // ✅ Added import
 
 class PlayerPage extends StatefulWidget {
   final Song song;
@@ -40,14 +41,13 @@ class _PlayerPageState extends State<PlayerPage> {
   }
 
   void _init() async {
-    if (_player.playing) return; // Don't interrupt
+    if (_player.playing) return;
 
     await _manager.setPlaylist(
       widget.playlist,
       startIndex: widget.playlist.indexWhere((s) => s.id == widget.song.id),
     );
 
-    // If there's a queue, append it
     final queue = await QueueService().getQueue();
     if (queue.isNotEmpty) {
       await _manager.appendToQueue(queue);
@@ -123,8 +123,6 @@ class _PlayerPageState extends State<PlayerPage> {
                     ),
                   ),
                   SizedBox(height: 20.h),
-
-                  /// Album Art
                   ClipRRect(
                     borderRadius: BorderRadius.circular(30),
                     child: Image.network(
@@ -134,10 +132,7 @@ class _PlayerPageState extends State<PlayerPage> {
                       fit: BoxFit.cover,
                     ),
                   ),
-
                   SizedBox(height: 30.h),
-
-                  /// Glass container with player controls
                   ClipRRect(
                     borderRadius: BorderRadius.circular(30),
                     child: BackdropFilter(
@@ -171,12 +166,10 @@ class _PlayerPageState extends State<PlayerPage> {
                               ),
                             ),
                             SizedBox(height: 20.h),
-
-                            /// Slider
                             SliderTheme(
                               data: SliderTheme.of(context).copyWith(
-                                activeTrackColor: Colors.white,
-                                inactiveTrackColor: Colors.white38,
+                                activeTrackColor: looliFirst,
+                                inactiveTrackColor: looliFourth,
                                 trackHeight: 4,
                                 thumbColor: Colors.white,
                                 overlayColor: Colors.white24,
@@ -203,7 +196,6 @@ class _PlayerPageState extends State<PlayerPage> {
                                 },
                               ),
                             ),
-
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -223,10 +215,7 @@ class _PlayerPageState extends State<PlayerPage> {
                                 ),
                               ],
                             ),
-
                             SizedBox(height: 15.h),
-
-                            /// Playback Controls
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -269,10 +258,7 @@ class _PlayerPageState extends State<PlayerPage> {
                                 ),
                               ],
                             ),
-
                             SizedBox(height: 15.h),
-
-                            /// Repeat & Shuffle
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -288,39 +274,61 @@ class _PlayerPageState extends State<PlayerPage> {
                                       icon: Icon(icon),
                                       color:
                                           mode == LoopMode.off
-                                              ? Colors.white30
-                                              : Colors.white,
+                                              ? looliFourth
+                                              : looliFirst,
                                       onPressed: _toggleRepeat,
                                     );
                                   },
                                 ),
 
-                                // Like Button (new center item)
-                                IconButton(
-                                  icon: Icon(
-                                    LikedSongsService.isLiked(currentSong.id)
-                                        ? Icons.favorite
-                                        : Icons.favorite_border,
-                                    color:
-                                        LikedSongsService.isLiked(
-                                              currentSong.id,
-                                            )
-                                            ? Colors.red
-                                            : Colors.white30,
-                                  ),
-                                  onPressed: () async {
-                                    if (LikedSongsService.isLiked(
-                                      currentSong.id,
-                                    )) {
-                                      await LikedSongsService.unlikeSong(
-                                        currentSong.id,
-                                      );
-                                    } else {
-                                      await LikedSongsService.likeSong(
-                                        currentSong,
-                                      );
+                                // Like Button
+                                ValueListenableBuilder<Song?>(
+                                  valueListenable: _manager.currentSongNotifier,
+                                  builder: (context, currentSong, _) {
+                                    if (currentSong == null) {
+                                      return const SizedBox();
                                     }
-                                    setState(() {});
+                                    final isLiked = LikedSongsService.isLiked(
+                                      currentSong.id,
+                                    );
+
+                                    return IconButton(
+                                      icon: Icon(
+                                        isLiked
+                                            ? Icons.favorite
+                                            : Icons.favorite_border,
+                                        color:
+                                            isLiked ? Colors.red : looliFourth,
+                                      ),
+                                      onPressed: () async {
+                                        if (isLiked) {
+                                          await LikedSongsService.unlikeSong(
+                                            currentSong.id,
+                                          );
+                                        } else {
+                                          await LikedSongsService.likeSong(
+                                            currentSong,
+                                          );
+                                        }
+                                        // Refresh UI by updating the currentSongNotifier's value to force rebuild
+                                        _manager.currentSongNotifier.value =
+                                            _manager.currentSongNotifier.value;
+                                      },
+                                    );
+                                  },
+                                ),
+
+                                // Queue Icon Button (Newly Moved Here)
+                                IconButton(
+                                  icon: const Icon(Icons.queue_music),
+                                  color: Colors.white,
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      backgroundColor: Colors.transparent,
+                                      isScrollControlled: true,
+                                      builder: (_) => const UpNextDrawer(),
+                                    );
                                   },
                                 ),
 
@@ -331,9 +339,7 @@ class _PlayerPageState extends State<PlayerPage> {
                                     return IconButton(
                                       icon: const Icon(Icons.shuffle),
                                       color:
-                                          isShuffled
-                                              ? Colors.white
-                                              : Colors.white30,
+                                          isShuffled ? looliFirst : looliFourth,
                                       onPressed: _toggleShuffle,
                                     );
                                   },
@@ -342,134 +348,6 @@ class _PlayerPageState extends State<PlayerPage> {
                             ),
 
                             SizedBox(height: 20.h),
-
-                            /// 🎵 Queue Preview
-                            /// 🎵 Queue List (Vertical with remove)
-                            /// 🎵 Queue Preview (Vertical with remove option)
-                            FutureBuilder<List<Song>>(
-                              future: QueueService().getQueue(),
-                              builder: (context, snapshot) {
-                                if (!snapshot.hasData ||
-                                    snapshot.data!.isEmpty) {
-                                  print(
-                                    "count of songs in queue: ${snapshot.data}",
-                                  );
-                                  return const SizedBox.shrink();
-                                }
-
-                                final queue = snapshot.data!;
-                                final currentId =
-                                    PlayerManager()
-                                        .currentSongNotifier
-                                        .value
-                                        ?.id;
-
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(height: 30),
-                                    const Text(
-                                      'Up Next',
-                                      style: TextStyle(
-                                        color: Colors.white70,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    ReorderableListView.builder(
-                                      shrinkWrap: true,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      itemCount: queue.length,
-                                      onReorder: (oldIndex, newIndex) async {
-                                        // Adjust the newIndex if dragging down
-                                        if (newIndex > oldIndex) newIndex--;
-
-                                        final updatedQueue = List<Song>.from(
-                                          queue,
-                                        );
-                                        final song = updatedQueue.removeAt(
-                                          oldIndex,
-                                        );
-                                        updatedQueue.insert(newIndex, song);
-
-                                        // Overwrite Isar queue with new order
-                                        final service = QueueService();
-                                        await service.clearQueue();
-                                        for (final s in updatedQueue) {
-                                          await service.addToQueue(s);
-                                        }
-
-                                        // Rebuild the UI
-                                        setState(() {});
-                                      },
-                                      itemBuilder: (context, index) {
-                                        final song = queue[index];
-                                        final isPlaying = song.id == currentId;
-
-                                        return ListTile(
-                                          key: ValueKey(song.id),
-                                          contentPadding: EdgeInsets.zero,
-                                          leading: ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                            child: Image.network(
-                                              song.image,
-                                              width: 50,
-                                              height: 50,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                          title: Text(
-                                            song.title,
-                                            style: TextStyle(
-                                              color:
-                                                  isPlaying
-                                                      ? looliSecond
-                                                      : looliFourth,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                          subtitle: Text(
-                                            song.artist,
-                                            style: const TextStyle(
-                                              color: Colors.white70,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                          onTap: () async {
-                                            final player = PlayerManager();
-                                            final fullList =
-                                                player.currentPlaylist;
-
-                                            final matchIndex = fullList
-                                                .indexWhere(
-                                                  (s) => s.id == song.id,
-                                                );
-                                            if (matchIndex != -1) {
-                                              await player.playSong(
-                                                fullList[matchIndex],
-                                                fullList,
-                                              );
-                                            } else {
-                                              await player.playSong(song, [
-                                                song,
-                                              ]);
-                                            }
-
-                                            player.currentSongNotifier.value =
-                                                song; // ✅ Only once
-                                            setState(() {});
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
                           ],
                         ),
                       ),

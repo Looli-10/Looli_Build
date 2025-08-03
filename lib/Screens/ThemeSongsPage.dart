@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:looli_app/Constants/Colors/app_colors.dart';
 import 'package:looli_app/Models/songs.dart';
-import 'package:looli_app/widgets/Bottom_nav.dart';
 import 'package:looli_app/widgets/mini_player.dart';
 import 'package:looli_app/widgets/audio_manager.dart';
 import 'package:looli_app/widgets/Song_Options.dart';

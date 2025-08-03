@@ -27,6 +27,8 @@ class LanguageSectionGrid extends StatelessWidget {
       }
     }
 
+    final limitedLanguages = languageGroups.entries.take(6).toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -43,11 +45,13 @@ class LanguageSectionGrid extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: 150,
-          child: ListView(
+          height: 160,
+          child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            children: languageGroups.entries.map((entry) {
+            itemCount: limitedLanguages.length,
+            itemBuilder: (context, index) {
+              final entry = limitedLanguages[index];
               final lang = entry.key;
               final color = hexToColor(languageColorMap[lang]!);
 
@@ -56,40 +60,53 @@ class LanguageSectionGrid extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => LanguageAlbumsPage(language: lang, songs: allSongs),
+                      builder: (_) => LanguageAlbumsPage(
+                        language: lang,
+                        songs: entry.value,
+                      ),
                     ),
                   );
                 },
                 child: Container(
-                  width: 120,
+                  width: 140,
                   margin: const EdgeInsets.only(right: 14),
                   decoration: BoxDecoration(
                     color: color,
                     borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 6,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: Stack(
                     children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.black.withOpacity(0.4),
-                              Colors.transparent,
-                            ],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
+                      Positioned.fill(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [
+                                Colors.black.withOpacity(0.5),
+                                Colors.transparent,
+                              ],
+                            ),
                           ),
                         ),
                       ),
+                      const SizedBox(height: 10),
                       Center(
                         child: Text(
                           lang,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: Colors.white,
-                            fontWeight: FontWeight.bold,
                             fontSize: 16,
+                            fontWeight: FontWeight.bold,
                             fontFamily: 'Poppins',
                             shadows: [
                               Shadow(blurRadius: 2, color: Colors.black),
@@ -101,7 +118,7 @@ class LanguageSectionGrid extends StatelessWidget {
                   ),
                 ),
               );
-            }).toList(),
+            },
           ),
         ),
       ],

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:looli_app/Models/songs.dart';
 import 'package:looli_app/Screens/LanguageSongsPage.dart';
 import 'package:looli_app/widgets/mini_player.dart';
-import 'AlbumSongsPage.dart'; // Create this screen to list songs in an album
 
 class LanguageAlbumsPage extends StatefulWidget {
   final String language;

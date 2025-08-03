@@ -8,6 +8,7 @@ import 'package:looli_app/widgets/ArtistSection.dart';
 import 'package:looli_app/widgets/LanguageSectionGrid.dart';
 import 'package:looli_app/widgets/ThemeAlbumCard.dart';
 import 'package:looli_app/widgets/mini_player.dart';
+import 'package:looli_app/widgets/LatestReleaseCard.dart'; // ✅ Make sure this is imported
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -22,9 +23,6 @@ class _HomepageState extends State<Homepage> {
   late Future<Map<String, String>> _themeImagesFuture;
   late Future<Map<String, String>> _artistImagesFuture;
   late Future<Map<String, String>> _languageColorMapFuture;
-
-  
-  get languageColorMap => null;
 
   @override
   void initState() {
@@ -90,41 +88,49 @@ class _HomepageState extends State<Homepage> {
             final themeImages = snapshot.data![2] as Map<String, String>;
             final artistImages = snapshot.data![3] as Map<String, String>;
             final languageColorMap = snapshot.data![4] as Map<String, String>;
-            
+
+            // ✅ Get the latest album (first in JSON)
+            final latestAlbum = albums.first;
+
+            // ✅ Prepare 4 random albums excluding the latest
+            final randomAlbums = List<Album>.from(albums)..removeAt(0);
+            randomAlbums.shuffle();
+            final gridAlbums = randomAlbums.take(4).toList();
 
             return Stack(
               children: [
                 ListView(
                   padding: const EdgeInsets.only(bottom: 90),
                   children: [
-                    const SizedBox(height: 20),
-
-                    /// 🔹 Albums Section
-                    AlbumsGridSection(albums: albums),
+                    const SizedBox(height: 10),
+                    /// 🔹 Latest Album Section
+                    LatestReleaseCard(album: latestAlbum),
+                    const SizedBox(height: 15),
+                    /// 🔹 Albums Section (Random Albums)
+                    AlbumsGridSection(albums: gridAlbums, song: songs),
                     const SizedBox(height: 30),
-
-                    /// 🔹 Theme Section with dynamic image map
+                    /// 🔹 Theme Section
                     ThemeAlbumCardSection(
                       allSongs: songs,
                       themeImageMap: themeImages,
                     ),
                     const SizedBox(height: 30),
-
-                    /// 🔹 Artist Section with artist image map
+                    /// 🔹 Artist Section
                     ArtistAlbumCardSection(
                       allSongs: songs,
                       artistImageMap: artistImages,
                     ),
                     const SizedBox(height: 30),
 
-                    /// 🔹 Language Section (NEW)
+                    /// 🔹 Language Section
                     LanguageSectionGrid(
                       allSongs: songs,
-                      languageColorMap: languageColorMap, 
+                      languageColorMap: languageColorMap,
                     ),
                     const SizedBox(height: 30),
                   ],
                 ),
+
                 /// 🔹 Mini Player
                 const Positioned(
                   left: 0,

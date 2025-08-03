@@ -141,7 +141,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
                             Text(
                               song.title,
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: looliSixth,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15,
                               ),
@@ -151,7 +151,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
                             Text(
                               song.artist,
                               style: const TextStyle(
-                                color: Colors.white70,
+                                color:looliThird,
                                 fontSize: 12,
                               ),
                               maxLines: 1,
@@ -164,7 +164,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
                           _player.playing
                               ? Icons.pause_rounded
                               : Icons.play_arrow_rounded,
-                          color: Colors.white,
+                          color: looliSixth,
                           size: 32,
                         ),
                         onPressed: () {

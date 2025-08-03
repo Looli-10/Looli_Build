@@ -4,7 +4,6 @@ import 'package:looli_app/Models/playlist.dart';
 import 'package:looli_app/Models/songs.dart';
 import 'package:looli_app/services/playlist_service.dart';
 import 'package:looli_app/services/song_service.dart';
-import 'package:hive/hive.dart';
 
 class AddSongsToPlaylistPage extends StatefulWidget {
   final Playlist playlist;

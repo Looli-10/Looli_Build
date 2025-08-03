@@ -4,7 +4,7 @@ import 'package:looli_app/Screens/ThemeSongsPage.dart';
 
 class ThemeAlbumCardSection extends StatelessWidget {
   final List<Song> allSongs;
-  final Map<String, String> themeImageMap; 
+  final Map<String, String> themeImageMap;
 
   const ThemeAlbumCardSection({
     super.key,
@@ -22,6 +22,8 @@ class ThemeAlbumCardSection extends StatelessWidget {
       themeGroups.putIfAbsent(theme, () => []).add(song);
     }
 
+    final limitedThemes = themeGroups.entries.take(6).toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -38,11 +40,13 @@ class ThemeAlbumCardSection extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: 150,
-          child: ListView(
+          height: 160,
+          child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            children: themeGroups.entries.map((entry) {
+            itemCount: limitedThemes.length,
+            itemBuilder: (context, index) {
+              final entry = limitedThemes[index];
               final theme = entry.key;
               final themeSongs = entry.value;
               final image = themeImageMap[theme] ??
@@ -62,40 +66,57 @@ class ThemeAlbumCardSection extends StatelessWidget {
                   );
                 },
                 child: Container(
-                  width: 120,
+                  width: 140,
                   margin: const EdgeInsets.only(right: 14),
                   decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
                     image: DecorationImage(
                       image: NetworkImage(image),
                       fit: BoxFit.cover,
                     ),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      gradient: LinearGradient(
-                        colors: [Colors.black.withOpacity(0.5), Colors.transparent],
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 6,
+                        offset: const Offset(0, 4),
                       ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        theme[0].toUpperCase() + theme.substring(1),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          fontFamily: 'Poppins',
-                          shadows: [Shadow(blurRadius: 2, color: Colors.black)],
+                    ],
+                  ),
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [
+                                Colors.black.withOpacity(0.6),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      Positioned(
+                        left: 10,
+                        bottom: 10,
+                        child: Text(
+                          theme[0].toUpperCase() + theme.substring(1),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            fontFamily: 'Poppins',
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               );
-            }).toList(),
+            },
           ),
         ),
       ],

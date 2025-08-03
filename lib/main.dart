@@ -4,7 +4,6 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:looli_app/Models/playlist.dart';
-import 'package:looli_app/Models/songs.dart' hide Song;
 import 'package:looli_app/Models/songs.dart';
 import 'package:looli_app/services/MainNavigation.dart';
 import 'package:looli_app/services/playlist_service.dart';
