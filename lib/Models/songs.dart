@@ -39,6 +39,19 @@ class Song extends HiveObject {
     required this.language,
   });
 
+  Song copy() {
+    return Song(
+      id: id,
+      title: title,
+      artist: artist,
+      url: url,
+      image: image,
+      album: album,
+      theme: theme,
+      language: language,
+    );
+  }
+
   factory Song.fromJson(Map<String, dynamic> json) {
     return Song(
       id: json['id']?.trim() ?? '',

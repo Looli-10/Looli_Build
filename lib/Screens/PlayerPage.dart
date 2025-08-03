@@ -285,9 +285,9 @@ class _PlayerPageState extends State<PlayerPage> {
                                 ValueListenableBuilder<Song?>(
                                   valueListenable: _manager.currentSongNotifier,
                                   builder: (context, currentSong, _) {
-                                    if (currentSong == null) {
+                                    if (currentSong == null)
                                       return const SizedBox();
-                                    }
+
                                     final isLiked = LikedSongsService.isLiked(
                                       currentSong.id,
                                     );
@@ -310,7 +310,6 @@ class _PlayerPageState extends State<PlayerPage> {
                                             currentSong,
                                           );
                                         }
-                                        // Refresh UI by updating the currentSongNotifier's value to force rebuild
                                         _manager.currentSongNotifier.value =
                                             _manager.currentSongNotifier.value;
                                       },

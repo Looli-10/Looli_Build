@@ -13,7 +13,8 @@ class LikedSongsService {
   }
 
   static Future<void> likeSong(Song song) async {
-    await _box.put(song.id, song);
+    final copiedSong = song.copy();
+    await _box.put(song.id, copiedSong);
     likedCountNotifier.value = _box.length;
   }
 
