@@ -66,10 +66,10 @@ class ThemeAlbumCardSection extends StatelessWidget {
                   );
                 },
                 child: Container(
-                  width: 140,
+                  width: 160,
                   margin: const EdgeInsets.only(right: 14),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(7),
                     image: DecorationImage(
                       image: NetworkImage(image),
                       fit: BoxFit.cover,

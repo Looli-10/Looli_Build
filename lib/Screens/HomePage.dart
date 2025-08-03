@@ -8,7 +8,7 @@ import 'package:looli_app/widgets/ArtistSection.dart';
 import 'package:looli_app/widgets/LanguageSectionGrid.dart';
 import 'package:looli_app/widgets/ThemeAlbumCard.dart';
 import 'package:looli_app/widgets/mini_player.dart';
-import 'package:looli_app/widgets/LatestReleaseCard.dart'; // ✅ Make sure this is imported
+import 'package:looli_app/widgets/LatestReleaseCard.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -46,23 +46,7 @@ class _HomepageState extends State<Homepage> {
 
     return SafeArea(
       child: Scaffold(
-        extendBodyBehindAppBar: true,
-        backgroundColor: Colors.black,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: const Text(
-            'Looli',
-            style: TextStyle(
-              color: looliFourth,
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-              fontFamily: 'Poppins',
-            ),
-          ),
-          centerTitle: true,
-        ),
+        backgroundColor: Colors.black26,
         body: FutureBuilder(
           future: Future.wait([
             _albumsFuture,
@@ -89,10 +73,8 @@ class _HomepageState extends State<Homepage> {
             final artistImages = snapshot.data![3] as Map<String, String>;
             final languageColorMap = snapshot.data![4] as Map<String, String>;
 
-            // ✅ Get the latest album (first in JSON)
             final latestAlbum = albums.first;
 
-            // ✅ Prepare 4 random albums excluding the latest
             final randomAlbums = List<Album>.from(albums)..removeAt(0);
             randomAlbums.shuffle();
             final gridAlbums = randomAlbums.take(4).toList();
@@ -100,38 +82,58 @@ class _HomepageState extends State<Homepage> {
             return Stack(
               children: [
                 ListView(
-                  padding: const EdgeInsets.only(bottom: 90),
                   children: [
+                    // This is the AppBar inside scrollable area
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      color: Colors.black12,
+                      alignment: Alignment.center,
+                      child: RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2,
+                            fontFamily: 'Poppins',
+                          ),
+                          children: [
+                            TextSpan(
+                              text: 'Lo',
+                              style: TextStyle(
+                                color: looliFourth,
+                              ), // first color
+                            ),
+                            TextSpan(
+                              text: 'oli',
+                              style: TextStyle(color: looliFirst),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
                     const SizedBox(height: 10),
-                    /// 🔹 Latest Album Section
+
                     LatestReleaseCard(album: latestAlbum),
                     const SizedBox(height: 15),
-                    /// 🔹 Albums Section (Random Albums)
                     AlbumsGridSection(albums: gridAlbums, song: songs),
                     const SizedBox(height: 30),
-                    /// 🔹 Theme Section
-                    ThemeAlbumCardSection(
-                      allSongs: songs,
-                      themeImageMap: themeImages,
-                    ),
-                    const SizedBox(height: 30),
-                    /// 🔹 Artist Section
                     ArtistAlbumCardSection(
                       allSongs: songs,
                       artistImageMap: artistImages,
                     ),
                     const SizedBox(height: 30),
-
-                    /// 🔹 Language Section
+                    ThemeAlbumCardSection(
+                      allSongs: songs,
+                      themeImageMap: themeImages,
+                    ),
+                    const SizedBox(height: 30),
                     LanguageSectionGrid(
                       allSongs: songs,
                       languageColorMap: languageColorMap,
                     ),
-                    const SizedBox(height: 30),
                   ],
                 ),
-
-                /// 🔹 Mini Player
                 const Positioned(
                   left: 0,
                   right: 0,

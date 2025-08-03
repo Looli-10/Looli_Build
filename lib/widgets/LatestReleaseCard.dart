@@ -37,16 +37,17 @@ class LatestReleaseCard extends StatelessWidget {
               ),
             ),
           ),
-          // Card
+          // Card with increased height
           InkWell(
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AlbumSongsPage(
-                    albumTitle: album.title,
-                    songs: album.songs,
-                  ),
+                  builder:
+                      (context) => AlbumSongsPage(
+                        albumTitle: album.title,
+                        songs: album.songs,
+                      ),
                 ),
               );
             },
@@ -58,7 +59,8 @@ class LatestReleaseCard extends StatelessWidget {
               ),
               elevation: 4,
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: IntrinsicHeight(
+              child: SizedBox(
+                height: 120, // Increased height here
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -70,7 +72,8 @@ class LatestReleaseCard extends StatelessWidget {
                       ),
                       child: Image.network(
                         album.image,
-                        width: 90,
+                        width: 120,
+                        height: double.infinity,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -88,7 +91,10 @@ class LatestReleaseCard extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: Colors.grey[850],
                                       borderRadius: BorderRadius.circular(4),
@@ -124,12 +130,15 @@ class LatestReleaseCard extends StatelessWidget {
                               icon: const Icon(
                                 Icons.play_circle_fill,
                                 color: looliFirst,
-                                size: 36,
+                                size: 46,
                               ),
                               onPressed: () {
                                 if (album.songs.isNotEmpty) {
                                   final firstSong = album.songs.first;
-                                  playerManager.playSong(firstSong, album.songs);
+                                  playerManager.playSong(
+                                    firstSong,
+                                    album.songs,
+                                  );
                                 }
                               },
                             ),

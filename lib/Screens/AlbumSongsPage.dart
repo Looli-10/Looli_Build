@@ -21,119 +21,160 @@ class AlbumSongsPage extends StatefulWidget {
 class _AlbumSongsPageState extends State<AlbumSongsPage> {
   final _playerManager = PlayerManager();
 
-  @override
+ @override
 Widget build(BuildContext context) {
   return Scaffold(
     backgroundColor: Colors.black,
-    appBar: AppBar(
-      title: Text(
-        widget.albumTitle,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      backgroundColor: Colors.black,
-      iconTheme: const IconThemeData(color: Colors.white),
-      elevation: 0,
-    ),
     body: Stack(
       children: [
         SafeArea(
-          child: ValueListenableBuilder<Song?>(
-            valueListenable: _playerManager.currentSongNotifier,
-            builder: (context, currentSong, _) {
-              return ListView.builder(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                itemCount: widget.songs.length + 1, // +1 for album image
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    // Album Image at top
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Image.network(
-                            widget.songs.first.image,
-                            width: 250,
-                            height: 250,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: Colors.grey[800],
-                                child: const Center(
-                                  child: Icon(Icons.error, color: Colors.white),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-                    );
-                  }
-
-                  final song = widget.songs[index - 1];
-                  final isPlaying = currentSong?.id == song.id;
-
-                  return GestureDetector(
-                    onTap: () async {
-                      await _playerManager.playSong(song, widget.songs);
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 14),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: isPlaying
-                            ? Colors.white.withOpacity(0.15)
-                            : Colors.white.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: isPlaying ? Colors.white30 : Colors.white10,
-                        ),
+          child: Column(
+            children: [
+              // Header Section like ArtistSongsPage
+              Stack(
+                children: [
+                  Container(
+                    height: 300,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: NetworkImage(widget.songs.first.image),
+                        fit: BoxFit.cover,
                       ),
-                      child: Row(
-                        children: [
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  song.title,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: isPlaying
-                                        ? FontWeight.bold
-                                        : FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  song.artist,
-                                  style: TextStyle(
-                                    color: isPlaying
-                                        ? Colors.white
-                                        : Colors.white60,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SongOptionsPopup(song: song, playlist: widget.songs),
+                    ),
+                  ),
+                  Container(
+                    height: 300,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withOpacity(0.8),
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.9),
                         ],
                       ),
                     ),
-                  );
-                },
-              );
-            },
+                  ),
+                  Positioned(
+                    left: 16,
+                    top: 16,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 30,
+                    left: 16,
+                    right: 16,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.albumTitle,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                if (widget.songs.isNotEmpty) {
+                                  _playerManager.playSong(widget.songs[0], widget.songs);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                              icon: const Icon(Icons.play_arrow),
+                              label: const Text("PLAY"),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              // Songs List
+              Expanded(
+                child: ValueListenableBuilder<Song?>(
+                  valueListenable: _playerManager.currentSongNotifier,
+                  builder: (context, currentSong, _) {
+                    return ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                      itemCount: widget.songs.length,
+                      itemBuilder: (context, index) {
+                        final song = widget.songs[index];
+                        final isPlaying = currentSong?.id == song.id;
+
+                        return GestureDetector(
+                          onTap: () async {
+                            await _playerManager.playSong(song, widget.songs);
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 14),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: isPlaying
+                                  ? Colors.white.withOpacity(0.15)
+                                  : Colors.white.withOpacity(0.05),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: isPlaying ? Colors.white30 : Colors.white10,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        song.title,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: isPlaying ? FontWeight.bold : FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        song.artist,
+                                        style: TextStyle(
+                                          color: isPlaying ? Colors.white : Colors.white60,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SongOptionsPopup(song: song, playlist: widget.songs),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ),
+
         const Positioned(
           left: 0,
           right: 0,

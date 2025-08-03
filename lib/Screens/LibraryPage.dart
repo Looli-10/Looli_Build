@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:looli_app/Constants/Colors/app_colors.dart';
 import 'package:looli_app/Screens/AddSongsToPlaylistPage.dart';
@@ -10,7 +9,7 @@ import 'package:looli_app/widgets/mini_player.dart';
 import 'package:looli_app/Screens/LikedSongsPage.dart';
 import 'package:looli_app/Screens/CreatePlaylistPage.dart';
 import 'package:looli_app/services/playlist_service.dart';
-import 'package:looli_app/Models/playlist.dart'; // You can rename AlbumSongsPage to PlaylistSongsPage
+import 'package:looli_app/Models/playlist.dart';
 
 class LibraryPage extends StatefulWidget {
   const LibraryPage({super.key});
@@ -38,31 +37,31 @@ class _LibraryPageState extends State<LibraryPage> {
     final likedSongs = LikedSongsService.getAllLiked();
 
     return Scaffold(
-      backgroundColor: looliThird,
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: looliThird,
+        backgroundColor: Colors.black,
         elevation: 0,
-        title: const Text("Library", style: TextStyle(color: looliFourth)),
+        title: const Text(
+          "Library",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Poppins',
+          ),
+        ),
       ),
       body: Stack(
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 85),
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
-                const SizedBox(height: 10),
-                const Text(
-                  "Your Collection",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: looliFourth,
-                  ),
-                ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
+                sectionHeader("Your Collection"),
 
-                /// Liked Songs
+                /// 💜 Liked Songs Card
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -70,12 +69,7 @@ class _LibraryPageState extends State<LibraryPage> {
                       MaterialPageRoute(builder: (_) => const LikedSongsPage()),
                     );
                   },
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white10,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                  child: containerCard(
                     child: Row(
                       children: [
                         Container(
@@ -85,7 +79,7 @@ class _LibraryPageState extends State<LibraryPage> {
                             gradient: const LinearGradient(
                               colors: [looliFirst, looliSecond],
                             ),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Icon(
                             Icons.favorite,
@@ -93,7 +87,7 @@ class _LibraryPageState extends State<LibraryPage> {
                             size: 30,
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 16),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,8 +98,10 @@ class _LibraryPageState extends State<LibraryPage> {
                                   fontSize: 18,
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
+                                  fontFamily: 'Poppins',
                                 ),
                               ),
+                              const SizedBox(height: 4),
                               ValueListenableBuilder<int>(
                                 valueListenable:
                                     LikedSongsService.likedCountNotifier,
@@ -132,23 +128,17 @@ class _LibraryPageState extends State<LibraryPage> {
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 30),
+                sectionHeader("Playlists"),
 
-                /// Playlist section
-                const Text(
-                  "Playlists",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: looliFourth,
-                  ),
-                ),
-                const SizedBox(height: 10),
-
+                /// 📂 Playlist List
                 if (playlists.isEmpty)
-                  const Text(
-                    "No playlists created yet.",
-                    style: TextStyle(color: Colors.white54),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    child: Text(
+                      "No playlists created yet.",
+                      style: TextStyle(color: Colors.white54),
+                    ),
                   )
                 else
                   ListView.builder(
@@ -167,13 +157,8 @@ class _LibraryPageState extends State<LibraryPage> {
                             ),
                           );
                         },
-                        child: Container(
+                        child: containerCard(
                           margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white10,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
                           child: Row(
                             children: [
                               Container(
@@ -181,7 +166,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                 height: 60,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
-                                  color: looliFourth,
+                                  color: Colors.white12,
                                 ),
                                 child:
                                     playlist.imagePath != null
@@ -200,24 +185,26 @@ class _LibraryPageState extends State<LibraryPage> {
                                           size: 30,
                                         ),
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: 14),
                               Expanded(
                                 child: Text(
                                   playlist.name,
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
                               PopupMenuButton<String>(
                                 icon: const Icon(
                                   Icons.more_vert,
-                                  color: Colors.white,
+                                  color: Colors.white70,
                                 ),
+                                color: looliFourth,
                                 onSelected: (value) async {
                                   if (value == 'edit') {
-                                    // Navigate to AddSongsToPlaylistPage
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -262,9 +249,9 @@ class _LibraryPageState extends State<LibraryPage> {
                     },
                   ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
 
-                /// Add Playlist
+                /// ➕ Create Playlist
                 GestureDetector(
                   onTap: () async {
                     await Navigator.push(
@@ -273,35 +260,63 @@ class _LibraryPageState extends State<LibraryPage> {
                         builder: (_) => const CreatePlaylistPage(),
                       ),
                     );
-                    loadPlaylists(); // Reload after creation
+                    loadPlaylists(); // Reload on return
                   },
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white12),
-                      borderRadius: BorderRadius.circular(12),
-                      color: Colors.white10,
-                    ),
+                  child: containerCard(
+                    border: Border.all(color: Colors.white12),
                     child: Row(
                       children: const [
-                        Icon(Icons.playlist_add, color: Colors.white, size: 28),
+                        Icon(Icons.playlist_add, color: Colors.white, size: 26),
                         SizedBox(width: 12),
                         Text(
                           "Create Playlist",
-                          style: TextStyle(color: Colors.white, fontSize: 16),
+                          style: TextStyle(color: Colors.white, fontSize: 16,fontFamily: 'Poppins'),
                         ),
                       ],
                     ),
                   ),
                 ),
+
+                const SizedBox(height: 20),
               ],
             ),
           ),
 
-          /// Mini Player
+          /// 🎵 Mini Player
           const Positioned(left: 0, right: 0, bottom: 0, child: MiniPlayer()),
         ],
       ),
+    );
+  }
+
+  /// Section Header Widget
+  Widget sectionHeader(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        color: looliFourth,
+        fontFamily: 'Poppins',
+      ),
+    );
+  }
+
+  /// Reusable container card
+  Widget containerCard({
+    required Widget child,
+    EdgeInsetsGeometry? margin,
+    BoxBorder? border,
+  }) {
+    return Container(
+      margin: margin ?? const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white10,
+        borderRadius: BorderRadius.circular(12),
+        border: border,
+      ),
+      child: child,
     );
   }
 }

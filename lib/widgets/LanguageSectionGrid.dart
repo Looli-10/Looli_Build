@@ -45,11 +45,18 @@ class LanguageSectionGrid extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: 160,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
+          height: 250, // Height to fit approx 2 rows with spacing
+          child: GridView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16),
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
             itemCount: limitedLanguages.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,       // 2 items per row
+              mainAxisSpacing: 14,     // vertical spacing between rows
+              crossAxisSpacing: 14,    // horizontal spacing between columns
+              childAspectRatio: 170 / 140, // width / height ratio of each item
+            ),
             itemBuilder: (context, index) {
               final entry = limitedLanguages[index];
               final lang = entry.key;
@@ -68,11 +75,11 @@ class LanguageSectionGrid extends StatelessWidget {
                   );
                 },
                 child: Container(
-                  width: 140,
-                  margin: const EdgeInsets.only(right: 14),
+                  width: 170,
+                  height: 140,
                   decoration: BoxDecoration(
                     color: color,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(7),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.2),
@@ -86,7 +93,7 @@ class LanguageSectionGrid extends StatelessWidget {
                       Positioned.fill(
                         child: Container(
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(7),
                             gradient: LinearGradient(
                               begin: Alignment.bottomCenter,
                               end: Alignment.topCenter,
@@ -98,7 +105,6 @@ class LanguageSectionGrid extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10),
                       Center(
                         child: Text(
                           lang,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:looli_app/Constants/Colors/app_colors.dart';
 import 'package:looli_app/Models/songs.dart';
 import 'package:looli_app/Screens/PlayerPage.dart';
 import 'package:looli_app/widgets/ArtistListSection.dart';
@@ -23,7 +24,7 @@ class SearchPage extends StatefulWidget {
   State<SearchPage> createState() => _SearchPageState();
 }
 
-class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateMixin {
+class _SearchPageState extends State<SearchPage> {
   String query = '';
   int selectedTabIndex = 0;
   List<Song> filteredSongs = [];
@@ -43,27 +44,30 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
       query = newQuery.toLowerCase();
 
       if (selectedTabIndex == 0) {
-        filteredSongs = widget.allSongs.where((song) {
-          return song.title.toLowerCase().contains(query) ||
-              song.artist.toLowerCase().contains(query) ||
-              song.album.toLowerCase().contains(query);
-        }).toList();
+        filteredSongs =
+            widget.allSongs.where((song) {
+              return song.title.toLowerCase().contains(query) ||
+                  song.artist.toLowerCase().contains(query) ||
+                  song.album.toLowerCase().contains(query);
+            }).toList();
       } else if (selectedTabIndex == 1) {
-        filteredAlbums = widget.allSongs
-            .map((song) => song.album)
-            .where((album) => album.toLowerCase().contains(query))
-            .toSet()
-            .toList();
+        filteredAlbums =
+            widget.allSongs
+                .map((song) => song.album)
+                .where((album) => album.toLowerCase().contains(query))
+                .toSet()
+                .toList();
       } else if (selectedTabIndex == 2) {
-        filteredArtists = widget.artistImageMap.entries
-            .where((entry) => entry.key.toLowerCase().contains(query))
-            .toList();
+        filteredArtists =
+            widget.artistImageMap.entries
+                .where((entry) => entry.key.toLowerCase().contains(query))
+                .toList();
       }
     });
   }
 
   void onTabChanged(int index) {
-    FocusScope.of(context).unfocus(); // dismiss cursor
+    FocusScope.of(context).unfocus();
     setState(() {
       selectedTabIndex = index;
       updateSearch(query);
@@ -80,32 +84,54 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
         },
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: () => FocusScope.of(context).unfocus(), // dismiss keyboard
+          onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: [
               Column(
                 children: [
                   /// 🔍 Search Bar
                   Container(
-                    color: Colors.black,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: const BoxDecoration(
+                      color: Colors.black,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black54,
+                          offset: Offset(0, 2),
+                          blurRadius: 6,
+                        ),
+                      ],
+                    ),
                     child: Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back, color: Colors.white),
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                          ),
                           onPressed: widget.onBackToHome,
                         ),
                         Expanded(
-                          child: TextField(
-                            autofocus: false,
-                            style: const TextStyle(color: Colors.white),
-                            cursorColor: Colors.white,
-                            decoration: const InputDecoration(
-                              hintText: 'Search songs, artists, albums',
-                              hintStyle: TextStyle(color: Colors.white70),
-                              border: InputBorder.none,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[900],
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            onChanged: updateSearch,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: TextField(
+                              style: const TextStyle(color: Colors.white),
+                              cursorColor: Colors.white,
+                              decoration: const InputDecoration(
+                                hintText: 'Search songs, artists, albums',
+                                hintStyle: TextStyle(color: Colors.white54),
+                                border: InputBorder.none,
+                                icon: Icon(Icons.search, color: Colors.white54),
+                              ),
+                              onChanged: updateSearch,
+                            ),
                           ),
                         ),
                       ],
@@ -114,12 +140,15 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
 
                   /// 🗂 Tabs
                   Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     color: Colors.black,
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _tabButton("Songs", 0),
+                        const SizedBox(width: 12),
                         _tabButton("Albums", 1),
+                        const SizedBox(width: 12),
                         _tabButton("Artists", 2),
                       ],
                     ),
@@ -127,28 +156,50 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
 
                   /// 📋 Content
                   Expanded(
-                    child: selectedTabIndex == 0
-                        ? buildSongsList()
-                        : selectedTabIndex == 1
-                            ? FullAlbumGridSection(
-                                albums: filteredAlbums.map((albumTitle) {
-                                  return Album(
-                                    title: albumTitle,
-                                    image: widget.allSongs.firstWhere((s) => s.album == albumTitle).image,
-                                    songs: widget.allSongs.where((s) => s.album == albumTitle).toList(),
-                                  );
-                                }).toList(),
+                    child: Container(
+                      color: Colors.black,
+                      child:
+                          selectedTabIndex == 0
+                              ? buildSongsList()
+                              : selectedTabIndex == 1
+                              ? FullAlbumGridSection(
+                                albums:
+                                    filteredAlbums.map((albumTitle) {
+                                      return Album(
+                                        title: albumTitle,
+                                        image:
+                                            widget.allSongs
+                                                .firstWhere(
+                                                  (s) => s.album == albumTitle,
+                                                )
+                                                .image,
+                                        songs:
+                                            widget.allSongs
+                                                .where(
+                                                  (s) => s.album == albumTitle,
+                                                )
+                                                .toList(),
+                                      );
+                                    }).toList(),
                               )
-                            : ArtistListSection(
+                              : ArtistListSection(
                                 allSongs: widget.allSongs,
-                                artistImageMap: Map.fromEntries(filteredArtists),
+                                artistImageMap: Map.fromEntries(
+                                  filteredArtists,
+                                ),
                               ),
+                    ),
                   ),
                 ],
               ),
 
               /// 🎵 Mini Player
-              const Positioned(left: 0, right: 0, bottom: 0, child: MiniPlayer()),
+              const Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: MiniPlayer(),
+              ),
             ],
           ),
         ),
@@ -169,53 +220,76 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
       padding: const EdgeInsets.only(bottom: 90),
       itemBuilder: (context, index) {
         final song = filteredSongs[index];
-        return ListTile(
-          leading: ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: Image.network(
-              song.image,
-              width: 50,
-              height: 50,
-              fit: BoxFit.cover,
-            ),
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.grey[900],
+            borderRadius: BorderRadius.circular(12),
           ),
-          title: Text(song.title, style: const TextStyle(color: Colors.white)),
-          subtitle: Text(
-            '${song.artist} • ${song.album}',
-            style: const TextStyle(color: Colors.white70),
-          ),
-          onTap: () async {
-            FocusScope.of(context).unfocus(); // dismiss keyboard before navigating
-            await PlayerManager().playSong(song, filteredSongs);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => PlayerPage(
-                  song: song,
-                  playlist: filteredSongs,
-                  album: song.album,
-                ),
+          child: ListTile(
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                song.image,
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
               ),
-            );
-          },
-          trailing: SongOptionsPopup(song: song, playlist: filteredSongs),
+            ),
+            title: Text(
+              song.title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+                fontFamily: 'Poppins'
+              ),
+            ),
+            subtitle: Text(
+              '${song.artist} • ${song.album}',
+              style: const TextStyle(color: Colors.white60, fontSize: 13),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            onTap: () async {
+              FocusScope.of(context).unfocus();
+              await PlayerManager().playSong(song, filteredSongs);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (_) => PlayerPage(
+                        song: song,
+                        playlist: filteredSongs,
+                        album: song.album,
+                      ),
+                ),
+              );
+            },
+            trailing: SongOptionsPopup(song: song, playlist: filteredSongs),
+          ),
         );
       },
     );
   }
 
-  /// 🏷 Tab Button Widget
+  /// 🏷 Pill-style Tab Button
   Widget _tabButton(String label, int index) {
     final isSelected = selectedTabIndex == index;
     return GestureDetector(
       onTap: () => onTabChanged(index),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? looliFirst : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white30),
+        ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.white54,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            color: isSelected ? Colors.black : Colors.white70,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'Poppins',
           ),
         ),
       ),

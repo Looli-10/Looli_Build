@@ -112,7 +112,7 @@ class AlbumsGridSection extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    song.first.artist,
+                                    album.songs.first.artist,
                                     maxLines: 1,
                                     style: const TextStyle(
                                       color: Colors.white60,

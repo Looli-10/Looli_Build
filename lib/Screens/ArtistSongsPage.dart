@@ -112,11 +112,6 @@ class _ArtistSongsPageState extends State<ArtistSongsPage> with TickerProviderSt
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            "711,149 Followers",
-                            style: TextStyle(color: Colors.white70, fontSize: 14),
-                          ),
                           const SizedBox(height: 12),
                           Row(
                             children: [
