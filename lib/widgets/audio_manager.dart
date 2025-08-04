@@ -1,3 +1,4 @@
+import 'package:hive/hive.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:looli_app/Models/songs.dart';
@@ -14,32 +15,27 @@ class PlayerManager {
   final ValueNotifier<bool> shuffleModeNotifier = ValueNotifier(false);
 
   List<Song> _playlist = [];
-  List<Song> _queue = [];
-  bool _isQueueActive = false;
-
   ConcatenatingAudioSource? _audioSource;
 
   PlayerManager._internal() {
-    _player.currentIndexStream.listen((index) {
+    _player.currentIndexStream.listen((index) async {
       if (index != null && index < _playlist.length) {
-        currentSongNotifier.value = _playlist[index];
-      }
-    });
+        final song = _playlist[index];
+        currentSongNotifier.value = song;
 
-    _player.playerStateStream.listen((state) async {
-      if (state.processingState == ProcessingState.completed) {
-        if (_isQueueActive && !_player.hasNext) {
-          _isQueueActive = false;
-          await _resumeAlbum();
-        }
+        // ✅ Save last played song and playlist
+        final box = await Hive.openBox('player_state');
+        await box.put('last_played_song', song);
+        await box.put('last_playlist', _playlist);
       }
     });
   }
 
   AudioPlayer get player => _player;
   List<Song> get currentPlaylist => _playlist;
-  set currentPlaylist(List<Song> playlist) {
-    _playlist = playlist;
+
+  set currentPlaylist(List<Song> songs) {
+    _playlist = songs;
   }
 
   Future<void> setPlaylist(List<Song> songs, {int startIndex = 0}) async {
@@ -63,20 +59,12 @@ class PlayerManager {
     await _player.stop();
     await _player.setAudioSource(_audioSource!, initialIndex: startIndex);
     await _player.play();
-    _isQueueActive = false;
   }
 
   Future<void> playSong(Song song, List<Song> playlist) async {
     final index = playlist.indexWhere((s) => s.id == song.id);
     if (index == -1) return;
     await setPlaylist(playlist, startIndex: index);
-  }
-
-  Future<void> playQueue(List<Song> queue) async {
-    if (queue.isEmpty) return;
-    _isQueueActive = true;
-    _queue = queue;
-    await playSong(queue.first, queue);
   }
 
   Future<void> appendToQueue(List<Song> newSongs) async {
@@ -99,25 +87,41 @@ class PlayerManager {
     final insertIndex = currentIndex + 1;
 
     _playlist.insertAll(insertIndex, newSongs);
-
     final concatSource = _audioSource as ConcatenatingAudioSource;
     await concatSource.insertAll(insertIndex, newSources);
   }
 
-  Future<void> resumeQueueIfExists() async {
-    final queue = await QueueService().getQueue();
-    if (queue.isNotEmpty) {
-      await playQueue(queue);
-    }
-  }
+  Future<void> restoreLastPlayedSong() async {
+    final box = await Hive.openBox('player_state');
+    final lastPlayedSong = box.get('last_played_song') as Song?;
+    final dynamicList = box.get('last_playlist');
 
-  Future<void> _resumeAlbum() async {
-    if (_playlist.isEmpty) return;
-    final current = currentSongNotifier.value;
-    final index = _playlist.indexWhere((s) => s.id == current?.id);
-    final nextIndex = index + 1;
-    if (nextIndex < _playlist.length) {
-      await setPlaylist(_playlist, startIndex: nextIndex);
+    if (lastPlayedSong != null && dynamicList != null && dynamicList is List) {
+      final List<Song> lastPlaylist = List<Song>.from(dynamicList);
+      final index = lastPlaylist.indexWhere((s) => s.id == lastPlayedSong.id);
+
+      if (index != -1) {
+        currentSongNotifier.value = lastPlayedSong;
+        _playlist = lastPlaylist;
+
+        _audioSource = ConcatenatingAudioSource(
+          children: lastPlaylist.map((s) {
+            return AudioSource.uri(
+              Uri.parse(s.url),
+              tag: MediaItem(
+                id: s.id.toString(),
+                title: s.title,
+                artist: s.artist,
+                album: s.album,
+                artUri: Uri.tryParse(s.image),
+              ),
+            );
+          }).toList(),
+        );
+
+        await _player.setAudioSource(_audioSource!, initialIndex: index);
+        // 🟡 Do not auto-play on app launch
+      }
     }
   }
 

@@ -3,7 +3,6 @@ import 'package:looli_app/Constants/Colors/app_colors.dart';
 import 'package:looli_app/Screens/PlayerPage.dart';
 import 'package:looli_app/widgets/audio_manager.dart';
 import 'package:looli_app/Models/songs.dart';
-import 'package:looli_app/services/queue_service.dart';
 
 class MiniPlayer extends StatefulWidget {
   const MiniPlayer({super.key});
@@ -34,22 +33,6 @@ class _MiniPlayerState extends State<MiniPlayer> {
         setState(() => _duration = duration);
       }
     });
-
-    // ✅ Start queued song if no song is currently playing
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final current = PlayerManager().currentSongNotifier.value;
-
-      // Load queue
-      final queue = await QueueService().getQueue();
-
-      if (current == null && queue.isNotEmpty) {
-        // Set the song, but do not autoplay unless the user was playing before
-        await PlayerManager().setSong(
-          queue.first,
-          queue,
-        ); // you must implement this
-      }
-    });
   }
 
   @override
@@ -76,14 +59,13 @@ class _MiniPlayerState extends State<MiniPlayer> {
                   builder:
                       (_) => PlayerPage(
                         song: current,
-                        playlist: PlayerManager().currentPlaylist,
+                        playlist: playlist,
                         album: song.album,
                       ),
                 ),
               );
             }
           },
-
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 50, vertical: 8),
             height: 70,
@@ -151,7 +133,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
                             Text(
                               song.artist,
                               style: const TextStyle(
-                                color:looliThird,
+                                color: looliThird,
                                 fontSize: 12,
                               ),
                               maxLines: 1,

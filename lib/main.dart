@@ -14,7 +14,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: WidgetsBinding.instance);
 
-  // Hive setup
   await Hive.initFlutter();
   Hive.registerAdapter(SongAdapter());
   await Hive.openBox<Song>('queue_songs');
@@ -25,12 +24,14 @@ Future<void> main() async {
   await Hive.openBox<Playlist>('custom_playlists');
   await PlaylistService.init();
 
-  // Just Audio Background
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.looli_app.channel.audio',
     androidNotificationChannelName: 'Audio Playback',
     androidNotificationOngoing: true,
   );
+
+
+  await PlayerManager().restoreLastPlayedSong();
 
   runApp(const MyApp());
 }
