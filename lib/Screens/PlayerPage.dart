@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:like_button/like_button.dart';
 import 'package:looli_app/Constants/Colors/app_colors.dart';
 import 'package:looli_app/Models/songs.dart';
 import 'package:looli_app/services/Liked_songs_service.dart';
@@ -115,9 +116,7 @@ class _PlayerPageState extends State<PlayerPage> {
               Positioned.fill(
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-                  child: Container(
-                    color: Colors.black.withOpacity(0.5),
-                  ),
+                  child: Container(color: Colors.black.withOpacity(0.5)),
                 ),
               ),
               SafeArea(
@@ -306,23 +305,36 @@ class _PlayerPageState extends State<PlayerPage> {
                                         if (currentSong == null)
                                           return const SizedBox();
 
-                                        final isLiked =
+                                        final isInitiallyLiked =
                                             LikedSongsService.isLiked(
                                               currentSong.id,
                                             );
 
-                                        return IconButton(
-                                          icon: Icon(
-                                            isLiked
-                                                ? Icons.favorite
-                                                : Icons.favorite_border,
-                                            color:
-                                                isLiked
-                                                    ? Colors.red
-                                                    : looliFourth,
+                                        return LikeButton(
+                                          isLiked: isInitiallyLiked,
+                                          size: 30,
+                                          circleColor: const CircleColor(
+                                            start: Color(0xff00ddff),
+                                            end: Color(0xff0099cc),
                                           ),
-                                          onPressed: () async {
-                                            if (isLiked) {
+                                          bubblesColor: const BubblesColor(
+                                            dotPrimaryColor: Colors.pink,
+                                            dotSecondaryColor: Colors.white,
+                                          ),
+                                          likeBuilder: (bool isLiked) {
+                                            return Icon(
+                                              Icons.favorite,
+                                              color:
+                                                  isLiked
+                                                      ? Colors.red
+                                                      : Colors.white.withOpacity(
+                                                        0.5,
+                                                      ),
+                                              size: 30,
+                                            );
+                                          },
+                                          onTap: (bool isCurrentlyLiked) async {
+                                            if (isCurrentlyLiked) {
                                               await LikedSongsService.unlikeSong(
                                                 currentSong.id,
                                               );
@@ -331,10 +343,14 @@ class _PlayerPageState extends State<PlayerPage> {
                                                 currentSong,
                                               );
                                             }
+
+                                            // Optionally update the notifier if you rely on external listeners
                                             _manager.currentSongNotifier.value =
                                                 _manager
                                                     .currentSongNotifier
                                                     .value;
+
+                                            return !isCurrentlyLiked;
                                           },
                                         );
                                       },
