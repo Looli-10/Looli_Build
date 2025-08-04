@@ -18,6 +18,7 @@ class BottomNavBar extends StatelessWidget {
       height: 60,
       animationDuration: const Duration(milliseconds: 300),
       animationCurve: Curves.easeInOut,
+      buttonBackgroundColor: looliFirst,
       items: const [
         Icon(Icons.home, color: looliFourth),
         Icon(Icons.search, color: looliFourth),

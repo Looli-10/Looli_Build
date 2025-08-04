@@ -113,7 +113,6 @@ class _HomepageState extends State<Homepage> {
                     ),
 
                     const SizedBox(height: 10),
-
                     LatestReleaseCard(album: latestAlbum),
                     const SizedBox(height: 15),
                     AlbumsGridSection(albums: gridAlbums, song: songs),
