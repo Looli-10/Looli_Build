@@ -31,7 +31,7 @@ class LatestReleaseCard extends StatelessWidget {
               'Latest Release',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 24,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Poppins',
               ),
@@ -47,6 +47,7 @@ class LatestReleaseCard extends StatelessWidget {
                       (context) => AlbumSongsPage(
                         albumTitle: album.title,
                         songs: album.songs,
+                        allSongs: [],
                       ),
                 ),
               );

@@ -30,6 +30,7 @@ class FullAlbumGridSection extends StatelessWidget {
                   builder: (_) => AlbumSongsPage(
                     albumTitle: album.title,
                     songs: album.songs,
+                    allSongs: [],
                   ),
                 ),
               );

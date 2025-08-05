@@ -6,6 +6,7 @@ import 'package:looli_app/services/song_service.dart';
 import 'package:looli_app/widgets/AlbumGridSection.dart';
 import 'package:looli_app/widgets/ArtistSection.dart';
 import 'package:looli_app/widgets/LanguageSectionGrid.dart';
+import 'package:looli_app/widgets/Recently_played_section.dart';
 import 'package:looli_app/widgets/ThemeAlbumCard.dart';
 import 'package:looli_app/widgets/mini_player.dart';
 import 'package:looli_app/widgets/LatestReleaseCard.dart';
@@ -112,6 +113,11 @@ class _HomepageState extends State<Homepage> {
                       ),
                     ),
 
+                    const SizedBox(height: 10),
+                    RecentlyPlayedSection(
+                      allAlbums: albums,
+                    song: songs.first,
+                    ),
                     const SizedBox(height: 10),
                     LatestReleaseCard(album: latestAlbum),
                     const SizedBox(height: 15),
