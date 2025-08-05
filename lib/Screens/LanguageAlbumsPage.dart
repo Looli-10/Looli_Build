@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:looli_app/Models/songs.dart';
+import 'package:looli_app/Screens/AlbumSongsPage.dart';
 import 'package:looli_app/Screens/LanguageSongsPage.dart';
 import 'package:looli_app/widgets/mini_player.dart';
 
@@ -38,21 +39,25 @@ class _LanguageAlbumsPageState extends State<LanguageAlbumsPage> {
       }
     }
 
-    _filteredAlbums = albumMap.entries.map((entry) {
-      return Album(
-        title: entry.key,
-        image: entry.value.first.image,
-        songs: entry.value,
-      );
-    }).toList();
+    _filteredAlbums =
+        albumMap.entries.map((entry) {
+          return Album(
+            title: entry.key,
+            image: entry.value.first.image,
+            songs: entry.value,
+          );
+        }).toList();
 
     _applySorting();
   }
 
   void _applySorting() {
-    _filteredAlbums.sort((a, b) => _isAscending
-        ? a.title.compareTo(b.title)
-        : b.title.compareTo(a.title));
+    _filteredAlbums.sort(
+      (a, b) =>
+          _isAscending
+              ? a.title.compareTo(b.title)
+              : b.title.compareTo(a.title),
+    );
   }
 
   void _applyFilter() {
@@ -67,13 +72,14 @@ class _LanguageAlbumsPageState extends State<LanguageAlbumsPage> {
     }
 
     setState(() {
-      _filteredAlbums = albumMap.entries.map((entry) {
-        return Album(
-          title: entry.key,
-          image: entry.value.first.image,
-          songs: entry.value,
-        );
-      }).toList();
+      _filteredAlbums =
+          albumMap.entries.map((entry) {
+            return Album(
+              title: entry.key,
+              image: entry.value.first.image,
+              songs: entry.value,
+            );
+          }).toList();
       _applySorting();
     });
   }
@@ -128,7 +134,10 @@ class _LanguageAlbumsPageState extends State<LanguageAlbumsPage> {
                       hintStyle: const TextStyle(color: Colors.white54),
                       filled: true,
                       fillColor: Colors.white10,
-                      prefixIcon: const Icon(Icons.search, color: Colors.white54),
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: Colors.white54,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -148,7 +157,12 @@ class _LanguageAlbumsPageState extends State<LanguageAlbumsPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => LanguageSongsPage(album: album)
+                              builder:
+                                  (_) => LanguageSongsPage(
+                                    languageTitle:widget.language,
+                                    songs: album.songs,
+                                    allSongs:widget.songs,
+                                  ),
                             ),
                           );
                         },

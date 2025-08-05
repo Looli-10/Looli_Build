@@ -180,7 +180,7 @@ class _SearchPageState extends State<SearchPage> {
                                                 )
                                                 .toList(),
                                       );
-                                    }).toList(),
+                                    }).toList(), allSongs: widget.allSongs,
                               )
                               : ArtistListSection(
                                 allSongs: widget.allSongs,

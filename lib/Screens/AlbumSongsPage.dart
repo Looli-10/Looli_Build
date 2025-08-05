@@ -234,141 +234,157 @@ class _AlbumSongsPageState extends State<AlbumSongsPage> {
                             Text(
                               mainArtist,
                               style: const TextStyle(
-                                color:looliFirst,
+                                color: looliFirst,
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'Poppins',
-                                letterSpacing: 2.5
+                                fontFamily: 'Kola',
+                                letterSpacing: 2.5,
                               ),
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 12),
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: albumsByArtist.take(4).length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                childAspectRatio: 1,
-                                crossAxisSpacing: 12,
-                                mainAxisSpacing: 12,
+
+                        // 🔀 Shuffle and exclude current album
+                        Builder(
+                          builder: (context) {
+                            final shuffledAlbumsByArtist = [
+                              ...albumsByArtist.where(
+                                (a) => a != widget.albumTitle,
                               ),
-                          itemBuilder: (context, index) {
-                            final album =
-                                albumsByArtist.take(4).toList()[index];
-                            final albumSongs =
-                                widget.allSongs
-                                    .where(
-                                      (song) =>
-                                          song.album == album &&
-                                          song.artist
-                                                  .split(',')
-                                                  .first
-                                                  .trim()
-                                                  .toLowerCase() ==
-                                              mainArtist.toLowerCase(),
-                                    )
-                                    .toList();
+                            ]..shuffle();
 
-                            if (albumSongs.isEmpty) return const SizedBox();
+                            return GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: shuffledAlbumsByArtist.take(4).length,
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    childAspectRatio: 1,
+                                    crossAxisSpacing: 12,
+                                    mainAxisSpacing: 12,
+                                  ),
+                              itemBuilder: (context, index) {
+                                final album = shuffledAlbumsByArtist[index];
+                                final albumSongs =
+                                    widget.allSongs
+                                        .where(
+                                          (song) =>
+                                              song.album == album &&
+                                              song.artist
+                                                      .split(',')
+                                                      .first
+                                                      .trim()
+                                                      .toLowerCase() ==
+                                                  mainArtist.toLowerCase(),
+                                        )
+                                        .toList();
 
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (_) => AlbumSongsPage(
-                                          albumTitle: album,
-                                          songs: albumSongs,
-                                          allSongs: widget.allSongs,
+                                if (albumSongs.isEmpty) return const SizedBox();
+
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (_) => AlbumSongsPage(
+                                              albumTitle: album,
+                                              songs: albumSongs,
+                                              allSongs: widget.allSongs,
+                                            ),
+                                      ),
+                                    );
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: BackdropFilter(
+                                      filter: ImageFilter.blur(
+                                        sigmaX: 10,
+                                        sigmaY: 10,
+                                      ),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.08),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.white.withOpacity(
+                                              0.2,
+                                            ),
+                                            width: 1,
+                                          ),
                                         ),
+                                        child: Stack(
+                                          children: [
+                                            Positioned.fill(
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                child: Image.network(
+                                                  albumSongs.first.image,
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder:
+                                                      (
+                                                        _,
+                                                        __,
+                                                        ___,
+                                                      ) => const Center(
+                                                        child: Icon(
+                                                          Icons
+                                                              .image_not_supported,
+                                                          size: 60,
+                                                          color: Colors.white54,
+                                                        ),
+                                                      ),
+                                                ),
+                                              ),
+                                            ),
+                                            Positioned(
+                                              bottom: 0,
+                                              left: 0,
+                                              right: 0,
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 6,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black
+                                                      .withOpacity(1),
+                                                  borderRadius:
+                                                      const BorderRadius.only(
+                                                        bottomLeft:
+                                                            Radius.circular(20),
+                                                        bottomRight:
+                                                            Radius.circular(20),
+                                                      ),
+                                                ),
+                                                child: Text(
+                                                  album,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  textAlign: TextAlign.center,
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                    fontFamily: 'Poppins',
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 );
                               },
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: BackdropFilter(
-                                  filter: ImageFilter.blur(
-                                    sigmaX: 10,
-                                    sigmaY: 10,
-                                  ),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.08),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: Colors.white.withOpacity(0.2),
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: Stack(
-                                      children: [
-                                        // Background image fills the entire container
-                                        Positioned.fill(
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                            child: Image.network(
-                                              albumSongs.first.image,
-                                              fit: BoxFit.cover,
-                                              errorBuilder:
-                                                  (_, __, ___) => const Center(
-                                                    child: Icon(
-                                                      Icons.image_not_supported,
-                                                      size: 60,
-                                                      color: Colors.white54,
-                                                    ),
-                                                  ),
-                                            ),
-                                          ),
-                                        ),
-                                        // Album title at the bottom
-                                        Positioned(
-                                          bottom: 0,
-                                          left: 0,
-                                          right: 0,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                              vertical: 6,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.black.withOpacity(
-                                                1,
-                                              ),
-                                              borderRadius:
-                                                  const BorderRadius.only(
-                                                    bottomLeft: Radius.circular(
-                                                      20,
-                                                    ),
-                                                    bottomRight:
-                                                        Radius.circular(20),
-                                                  ),
-                                            ),
-                                            child: Text(
-                                              album,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                                fontFamily: 'Poppins',
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
                             );
                           },
                         ),

@@ -9,21 +9,28 @@ class BottomNavBar extends StatelessWidget {
   const BottomNavBar({super.key, required this.currentIndex, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
-    return CurvedNavigationBar(
-      index: currentIndex,
-      onTap: onTap,
-      backgroundColor: Colors.transparent,
-      color: looliFifth,
-      height: 60,
-      animationDuration: const Duration(milliseconds: 300),
-      animationCurve: Curves.easeInOut,
-      buttonBackgroundColor: looliFirst,
-      items: const [
-        Icon(Icons.home, color: looliFourth),
-        Icon(Icons.search, color: looliFourth),
-        Icon(Icons.library_music, color: looliFourth),
-      ],
-    );
-  }
+Widget build(BuildContext context) {
+  final List<IconData> icons = [
+    Icons.home,
+    Icons.search,
+    Icons.library_music,
+  ];
+
+  return CurvedNavigationBar(
+    index: currentIndex,
+    onTap: onTap,
+    backgroundColor: Colors.transparent,
+    color: looliFifth,
+    height: 60,
+    animationDuration: const Duration(milliseconds: 300),
+    animationCurve: Curves.easeInOut,
+    buttonBackgroundColor: looliFirst,
+    items: List.generate(icons.length, (index) {
+      return Icon(
+        icons[index],
+        color: index == currentIndex ? Colors.black : looliFourth,
+      );
+    }),
+  );
+}
 }

@@ -4,8 +4,9 @@ import 'package:looli_app/Screens/AlbumSongsPage.dart';
 
 class FullAlbumGridSection extends StatelessWidget {
   final List<Album> albums;
+  final List<Song> allSongs;
 
-  const FullAlbumGridSection({super.key, required this.albums});
+  const FullAlbumGridSection({super.key, required this.albums, required this.allSongs});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +31,7 @@ class FullAlbumGridSection extends StatelessWidget {
                   builder: (_) => AlbumSongsPage(
                     albumTitle: album.title,
                     songs: album.songs,
-                    allSongs: [],
+                    allSongs:allSongs ,
                   ),
                 ),
               );
