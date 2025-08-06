@@ -9,7 +9,8 @@ import 'package:looli_app/Models/songs.dart';
 import 'package:looli_app/services/Liked_songs_service.dart';
 import 'package:looli_app/widgets/audio_manager.dart';
 import 'package:looli_app/services/queue_service.dart';
-import 'package:looli_app/widgets/up_next_drawer.dart'; // ✅ Added import
+import 'package:looli_app/widgets/up_next_drawer.dart';
+import 'package:simple_waveform_progressbar/simple_waveform_progressbar.dart'; // ✅ Added import
 
 class PlayerPage extends StatefulWidget {
   final Song song;
@@ -179,36 +180,42 @@ class _PlayerPageState extends State<PlayerPage> {
                                   ),
                                 ),
                                 SizedBox(height: 20.h),
-                                SliderTheme(
-                                  data: SliderTheme.of(context).copyWith(
-                                    activeTrackColor: looliFirst,
-                                    inactiveTrackColor: looliFourth,
-                                    trackHeight: 4,
-                                    thumbColor: Colors.white,
-                                    overlayColor: Colors.white24,
-                                    thumbShape: const RoundSliderThumbShape(
-                                      enabledThumbRadius: 8,
-                                    ),
+                                Container(
+                                  width: double.infinity,
+                                  height: 30,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
                                   ),
-                                  child: Slider(
-                                    value:
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color: Colors.transparent,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.transparent,
+                                        offset: const Offset(0, 4),
+                                        spreadRadius: 5,
+                                        blurRadius: 3,
+                                      ),
+                                    ],
+                                  ),
+                                  child: WaveformProgressbar(
+                                    color: Colors.grey,
+                                    progressColor: looliFirst,
+                                    progress:
                                         _duration.inSeconds > 0
-                                            ? _position.inSeconds
-                                                .clamp(0, _duration.inSeconds)
-                                                .toDouble()
+                                            ? _position.inSeconds /
+                                                _duration.inSeconds
                                             : 0.0,
-                                    min: 0,
-                                    max:
-                                        _duration.inSeconds > 0
-                                            ? _duration.inSeconds.toDouble()
-                                            : 1.0,
-                                    onChanged: (value) {
+                                    onTap: (prgs) {
+                                      final newPosition =
+                                          (_duration.inSeconds * prgs).toInt();
                                       _player.seek(
-                                        Duration(seconds: value.toInt()),
+                                        Duration(seconds: newPosition),
                                       );
                                     },
                                   ),
                                 ),
+                                const SizedBox(height: 8),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -327,9 +334,8 @@ class _PlayerPageState extends State<PlayerPage> {
                                               color:
                                                   isLiked
                                                       ? Colors.red
-                                                      : Colors.white.withOpacity(
-                                                        0.5,
-                                                      ),
+                                                      : Colors.white
+                                                          .withOpacity(0.5),
                                               size: 30,
                                             );
                                           },

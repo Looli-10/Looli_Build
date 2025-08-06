@@ -11,7 +11,9 @@ class PlayerManager {
 
   final AudioPlayer _player = AudioPlayer();
   final ValueNotifier<Song?> currentSongNotifier = ValueNotifier(null);
-  final ValueNotifier<LoopMode> repeatModeNotifier = ValueNotifier(LoopMode.off);
+  final ValueNotifier<LoopMode> repeatModeNotifier = ValueNotifier(
+    LoopMode.off,
+  );
   final ValueNotifier<bool> shuffleModeNotifier = ValueNotifier(false);
 
   List<Song> _playlist = [];
@@ -23,10 +25,27 @@ class PlayerManager {
         final song = _playlist[index];
         currentSongNotifier.value = song;
 
-        // ✅ Save last played song and playlist
+        // ✅ Save last played song
         final box = await Hive.openBox('player_state');
         await box.put('last_played_song', song);
-        await box.put('last_playlist', _playlist);
+
+        // 🔧 NEW LOGIC FOR RECENTLY PLAYED
+        List<dynamic> existing = box.get('last_playlist', defaultValue: []);
+        List<Song> recentSongs = List<Song>.from(existing);
+
+        // Remove if already exists to avoid duplicates
+        recentSongs.removeWhere((s) => s.id == song.id);
+
+        // Add song to end (most recent last)
+        recentSongs.add(song);
+
+        // Limit to last 10 songs
+        if (recentSongs.length > 10) {
+          recentSongs = recentSongs.sublist(recentSongs.length - 10);
+        }
+
+        // Save updated list
+        await box.put('last_playlist', recentSongs);
       }
     });
   }
@@ -42,18 +61,19 @@ class PlayerManager {
     _playlist = songs;
 
     _audioSource = ConcatenatingAudioSource(
-      children: songs.map((s) {
-        return AudioSource.uri(
-          Uri.parse(s.url),
-          tag: MediaItem(
-            id: s.id.toString(),
-            title: s.title,
-            artist: s.artist,
-            album: s.album,
-            artUri: Uri.tryParse(s.image),
-          ),
-        );
-      }).toList(),
+      children:
+          songs.map((s) {
+            return AudioSource.uri(
+              Uri.parse(s.url),
+              tag: MediaItem(
+                id: s.id.toString(),
+                title: s.title,
+                artist: s.artist,
+                album: s.album,
+                artUri: Uri.tryParse(s.image),
+              ),
+            );
+          }).toList(),
     );
 
     await _player.stop();
@@ -70,18 +90,19 @@ class PlayerManager {
   Future<void> appendToQueue(List<Song> newSongs) async {
     if (_audioSource == null || _playlist.isEmpty) return;
 
-    final newSources = newSongs.map((s) {
-      return AudioSource.uri(
-        Uri.parse(s.url),
-        tag: MediaItem(
-          id: s.id.toString(),
-          title: s.title,
-          artist: s.artist,
-          album: s.album,
-          artUri: Uri.tryParse(s.image),
-        ),
-      );
-    }).toList();
+    final newSources =
+        newSongs.map((s) {
+          return AudioSource.uri(
+            Uri.parse(s.url),
+            tag: MediaItem(
+              id: s.id.toString(),
+              title: s.title,
+              artist: s.artist,
+              album: s.album,
+              artUri: Uri.tryParse(s.image),
+            ),
+          );
+        }).toList();
 
     final currentIndex = _player.currentIndex ?? 0;
     final insertIndex = currentIndex + 1;
@@ -105,18 +126,19 @@ class PlayerManager {
         _playlist = lastPlaylist;
 
         _audioSource = ConcatenatingAudioSource(
-          children: lastPlaylist.map((s) {
-            return AudioSource.uri(
-              Uri.parse(s.url),
-              tag: MediaItem(
-                id: s.id.toString(),
-                title: s.title,
-                artist: s.artist,
-                album: s.album,
-                artUri: Uri.tryParse(s.image),
-              ),
-            );
-          }).toList(),
+          children:
+              lastPlaylist.map((s) {
+                return AudioSource.uri(
+                  Uri.parse(s.url),
+                  tag: MediaItem(
+                    id: s.id.toString(),
+                    title: s.title,
+                    artist: s.artist,
+                    album: s.album,
+                    artUri: Uri.tryParse(s.image),
+                  ),
+                );
+              }).toList(),
         );
 
         await _player.setAudioSource(_audioSource!, initialIndex: index);

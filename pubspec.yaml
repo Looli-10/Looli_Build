@@ -56,6 +56,8 @@ dependencies:
   image_picker: ^1.1.2
   like_button: ^2.1.0
   connectivity_plus: ^6.1.4
+  internet_connection_checker: ^3.0.1
+  simple_waveform_progressbar: ^0.0.3
 
 
 # flutter_native_splash: 

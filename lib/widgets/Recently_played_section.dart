@@ -8,7 +8,11 @@ class RecentlyPlayedSection extends StatelessWidget {
   final List<Album> allAlbums;
   final Song song;
 
-  const RecentlyPlayedSection({super.key, required this.allAlbums, required this.song});
+  const RecentlyPlayedSection({
+    super.key,
+    required this.allAlbums,
+    required this.song,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,20 +27,25 @@ class RecentlyPlayedSection extends StatelessWidget {
         };
 
         final List<Album> displayedAlbums = [];
+        final Set<String> addedAlbumTitles = {};
 
+        // Show recently played albums (most recent first)
         for (var song in recentSongs.reversed) {
           final album = albumMap[song.album];
-          if (album != null && !displayedAlbums.contains(album)) {
+          if (album != null && addedAlbumTitles.add(album.title)) {
             displayedAlbums.add(album);
             if (displayedAlbums.length == 4) break;
           }
         }
 
+        // Fill up remaining with albums not already in the list
+        // Fill up remaining with albums not already in the list
         if (displayedAlbums.length < 4) {
-          for (int i = 1; i < allAlbums.length && displayedAlbums.length < 4; i++) {
+          for (int i = 1; i < allAlbums.length; i++) {
             final album = allAlbums[i];
-            if (!displayedAlbums.contains(album)) {
+            if (addedAlbumTitles.add(album.title)) {
               displayedAlbums.add(album);
+              if (displayedAlbums.length == 4) break;
             }
           }
         }
@@ -55,7 +64,6 @@ class RecentlyPlayedSection extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                   fontFamily: 'Poppins',
-
                 ),
               ),
               SizedBox(height: 12.h),
@@ -76,11 +84,13 @@ class RecentlyPlayedSection extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => AlbumSongsPage(
-                            albumTitle: album.title,
-                            songs: album.songs,
-                            allSongs: allAlbums.expand((album)=>album.songs).toList()
-                          ),
+                          builder:
+                              (_) => AlbumSongsPage(
+                                albumTitle: album.title,
+                                songs: album.songs,
+                                allSongs:
+                                    allAlbums.expand((a) => a.songs).toList(),
+                              ),
                         ),
                       );
                     },
@@ -100,16 +110,17 @@ class RecentlyPlayedSection extends StatelessWidget {
                               width: 60.w,
                               height: double.infinity,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
-                                width: 60.w,
-                                height: double.infinity,
-                                color: Colors.black26,
-                                child: Icon(
-                                  Icons.music_note,
-                                  color: Colors.white70,
-                                  size: 28,
-                                ),
-                              ),
+                              errorBuilder:
+                                  (_, __, ___) => Container(
+                                    width: 60.w,
+                                    height: double.infinity,
+                                    color: Colors.black26,
+                                    child: Icon(
+                                      Icons.music_note,
+                                      color: Colors.white70,
+                                      size: 28,
+                                    ),
+                                  ),
                             ),
                           ),
                           SizedBox(width: 10.w),

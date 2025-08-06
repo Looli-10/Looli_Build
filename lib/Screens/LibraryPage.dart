@@ -31,6 +31,13 @@ class _LibraryPageState extends State<LibraryPage> {
     playlists = await PlaylistService.getAllPlaylists();
     setState(() {});
   }
+  Future<void> _refreshPlaylists() async {
+  final updatedPlaylists = await PlaylistService.getAllPlaylists();
+  setState(() {
+    playlists = updatedPlaylists;
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -149,13 +156,16 @@ class _LibraryPageState extends State<LibraryPage> {
                       final playlist = playlists[index];
                       return GestureDetector(
                         onTap: () {
-                          Navigator.push(
+                          final result = Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder:
                                   (_) => PlaylistDetailPage(playlist: playlist),
                             ),
                           );
+                          if(result==true){
+                            _refreshPlaylists();
+                          }
                         },
                         child: containerCard(
                           margin: const EdgeInsets.only(bottom: 12),
