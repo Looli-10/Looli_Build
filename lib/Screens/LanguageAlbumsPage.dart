@@ -162,6 +162,7 @@ class _LanguageAlbumsPageState extends State<LanguageAlbumsPage> {
                                     languageTitle:widget.language,
                                     songs: album.songs,
                                     allSongs:widget.songs,
+                                    allAlbums: _filteredAlbums,
                                   ),
                             ),
                           );

@@ -11,12 +11,14 @@ class LanguageSongsPage extends StatefulWidget {
   final String languageTitle;
   final List<Song> songs;
   final List<Song> allSongs;
+  final List<Album> allAlbums;
 
   const LanguageSongsPage({
     super.key,
     required this.languageTitle,
     required this.songs,
     required this.allSongs,
+    required this.allAlbums,
   });
 
   @override
@@ -70,7 +72,7 @@ class _LanguageSongsPageState extends State<LanguageSongsPage> {
                   centerTitle: true,
                   collapseMode: CollapseMode.parallax,
                   title: Text(
-                    widget.languageTitle,
+                    widget.allAlbums.first.title,
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -307,6 +309,7 @@ class _LanguageSongsPageState extends State<LanguageSongsPage> {
                                               languageTitle: album,
                                               songs: albumSongs,
                                               allSongs: widget.allSongs,
+                                              allAlbums: widget.allAlbums,
                                             ),
                                       ),
                                     );

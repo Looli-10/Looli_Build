@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:looli_app/Constants/Colors/app_colors.dart';
 import 'package:looli_app/Screens/PlayerPage.dart';
@@ -20,14 +21,12 @@ class _MiniPlayerState extends State<MiniPlayer> {
   void initState() {
     super.initState();
 
-    // Listen for playback time
     _player.positionStream.listen((position) {
       if (mounted) {
         setState(() => _position = position);
       }
     });
 
-    // Listen for track duration
     _player.durationStream.listen((duration) {
       if (mounted && duration != null) {
         setState(() => _duration = duration);
@@ -42,10 +41,9 @@ class _MiniPlayerState extends State<MiniPlayer> {
       builder: (context, song, _) {
         if (song == null) return const SizedBox.shrink();
 
-        double progress =
-            (_duration.inMilliseconds > 0)
-                ? _position.inMilliseconds / _duration.inMilliseconds
-                : 0.0;
+        double progress = (_duration.inMilliseconds > 0)
+            ? _position.inMilliseconds / _duration.inMilliseconds
+            : 0.0;
 
         return GestureDetector(
           onTap: () {
@@ -56,32 +54,44 @@ class _MiniPlayerState extends State<MiniPlayer> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder:
-                      (_) => PlayerPage(
-                        song: current,
-                        playlist: playlist,
-                        album: song.album,
-                      ),
+                  builder: (_) => PlayerPage(
+                    song: current,
+                    playlist: playlist,
+                    album: song.album,
+                  ),
                 ),
               );
             }
           },
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 50, vertical: 8),
-            height: 70,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: <Color>[looliFirst, looliSecond],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
-              borderRadius: BorderRadius.circular(25),
-            ),
+            margin: const EdgeInsets.symmetric(horizontal: 65, vertical: 8),
+            height: 60,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(25),
               child: Stack(
-                alignment: Alignment.bottomCenter,
                 children: [
+                  // Background glass and gradient
+                  BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            looliFirst.withOpacity(0.15),
+                            looliSecond.withOpacity(0.15),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(25),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1.0,
+                        ),
+                      ),
+                    ),
+                  ),
+
                   // Progress bar
                   Positioned.fill(
                     child: Align(
@@ -90,9 +100,9 @@ class _MiniPlayerState extends State<MiniPlayer> {
                         widthFactor: progress,
                         child: Container(
                           height: 4,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.vertical(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.4),
+                            borderRadius: const BorderRadius.vertical(
                               bottom: Radius.circular(25),
                             ),
                           ),
@@ -123,7 +133,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
                             Text(
                               song.title,
                               style: const TextStyle(
-                                color: looliSixth,
+                                color: looliFourth,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15,
                               ),
@@ -133,7 +143,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
                             Text(
                               song.artist,
                               style: const TextStyle(
-                                color: looliThird,
+                                color: looliFourth,
                                 fontSize: 12,
                               ),
                               maxLines: 1,
@@ -146,16 +156,12 @@ class _MiniPlayerState extends State<MiniPlayer> {
                           _player.playing
                               ? Icons.pause_rounded
                               : Icons.play_arrow_rounded,
-                          color: looliSixth,
+                          color: looliFourth,
                           size: 32,
                         ),
                         onPressed: () {
                           setState(() {
-                            if (_player.playing) {
-                              _player.pause();
-                            } else {
-                              _player.play();
-                            }
+                            _player.playing ? _player.pause() : _player.play();
                           });
                         },
                       ),
