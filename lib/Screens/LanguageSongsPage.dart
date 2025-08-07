@@ -8,17 +8,15 @@ import 'package:looli_app/widgets/mini_player.dart';
 import 'package:looli_app/widgets/audio_manager.dart';
 
 class LanguageSongsPage extends StatefulWidget {
-  final String languageTitle;
+  final String albumTitle;
   final List<Song> songs;
   final List<Song> allSongs;
-  final List<Album> allAlbums;
 
   const LanguageSongsPage({
     super.key,
-    required this.languageTitle,
+    required this.albumTitle,
     required this.songs,
     required this.allSongs,
-    required this.allAlbums,
   });
 
   @override
@@ -72,7 +70,7 @@ class _LanguageSongsPageState extends State<LanguageSongsPage> {
                   centerTitle: true,
                   collapseMode: CollapseMode.parallax,
                   title: Text(
-                    widget.allAlbums.first.title,
+                    widget.albumTitle,
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -266,7 +264,7 @@ class _LanguageSongsPageState extends State<LanguageSongsPage> {
                           builder: (context) {
                             final shuffledAlbumsByArtist = [
                               ...albumsByArtist.where(
-                                (a) => a != widget.languageTitle,
+                                (a) => a != widget.albumTitle,
                               ),
                             ]..shuffle();
 
@@ -306,10 +304,9 @@ class _LanguageSongsPageState extends State<LanguageSongsPage> {
                                       MaterialPageRoute(
                                         builder:
                                             (_) => LanguageSongsPage(
-                                              languageTitle: album,
+                                              albumTitle: album,
                                               songs: albumSongs,
                                               allSongs: widget.allSongs,
-                                              allAlbums: widget.allAlbums,
                                             ),
                                       ),
                                     );

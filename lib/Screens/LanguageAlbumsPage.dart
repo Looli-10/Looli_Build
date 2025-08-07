@@ -159,10 +159,9 @@ class _LanguageAlbumsPageState extends State<LanguageAlbumsPage> {
                             MaterialPageRoute(
                               builder:
                                   (_) => LanguageSongsPage(
-                                    languageTitle:widget.language,
+                                    albumTitle:album.title,
                                     songs: album.songs,
                                     allSongs:widget.songs,
-                                    allAlbums: _filteredAlbums,
                                   ),
                             ),
                           );

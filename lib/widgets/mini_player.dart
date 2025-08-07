@@ -41,9 +41,10 @@ class _MiniPlayerState extends State<MiniPlayer> {
       builder: (context, song, _) {
         if (song == null) return const SizedBox.shrink();
 
-        double progress = (_duration.inMilliseconds > 0)
-            ? _position.inMilliseconds / _duration.inMilliseconds
-            : 0.0;
+        double progress =
+            (_duration.inMilliseconds > 0)
+                ? _position.inMilliseconds / _duration.inMilliseconds
+                : 0.0;
 
         return GestureDetector(
           onTap: () {
@@ -54,17 +55,18 @@ class _MiniPlayerState extends State<MiniPlayer> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => PlayerPage(
-                    song: current,
-                    playlist: playlist,
-                    album: song.album,
-                  ),
+                  builder:
+                      (_) => PlayerPage(
+                        song: current,
+                        playlist: playlist,
+                        album: song.album,
+                      ),
                 ),
               );
             }
           },
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 65, vertical: 8),
+            margin: const EdgeInsets.symmetric(horizontal: 70, vertical: 8),
             height: 60,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(25),
@@ -75,17 +77,10 @@ class _MiniPlayerState extends State<MiniPlayer> {
                     filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
                     child: Container(
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            looliFirst.withOpacity(0.15),
-                            looliSecond.withOpacity(0.15),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+                        color: looliFirst.withOpacity(0.80),
                         borderRadius: BorderRadius.circular(25),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.transparent,
                           width: 1.0,
                         ),
                       ),
