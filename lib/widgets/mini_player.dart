@@ -96,7 +96,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
                         child: Container(
                           height: 4,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.4),
+                            color: Colors.white,
                             borderRadius: const BorderRadius.vertical(
                               bottom: Radius.circular(25),
                             ),

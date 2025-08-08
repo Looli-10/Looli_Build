@@ -10,7 +10,6 @@ import 'package:looli_app/Constants/Colors/app_colors.dart';
 import 'package:looli_app/AuthScreens/Login.dart';
 import 'package:looli_app/Screens/HomePage.dart';
 
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -27,37 +26,40 @@ class _LoginPageState extends State<LoginPage> {
     String name = _nameController.text.trim();
     String mail = _emailController.text.trim();
     String password = _passwordController.text.trim();
-    if (name.isEmpty ||mail.isEmpty ||password.isEmpty) {
+    if (name.isEmpty || mail.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar( 
+        const SnackBar(
           content: Text('Please fill in all fields'),
           backgroundColor: looliThird,
         ),
       );
       return;
-    }
-    else{
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(email:mail , password: password)
+    } else {
+      await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: mail, password: password)
           .then((value) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Account Created Successfully!'),
-            backgroundColor: Colors.deepOrangeAccent,
-          ),
-        );
-        Navigator.pushReplacement(context, MaterialPageRoute(
-          builder: (context) => const AuthLogin(),
-        ));
-      }).catchError((error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${error.toString()}'),
-            backgroundColor: looliThird,
-          ),
-        );
-      });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Account Created Successfully!'),
+                backgroundColor: Colors.deepOrangeAccent,
+              ),
+            );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const AuthLogin()),
+            );
+          })
+          .catchError((error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error: ${error.toString()}'),
+                backgroundColor: looliThird,
+              ),
+            );
+          });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
@@ -78,10 +80,31 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 SizedBox(height: 30.h),
                 Center(
-                  child: Image.asset(
-                    'assets/icons/LooliText.png',
-                    width: 80.w,
-                    height: 80.h,
+                  child: RichText(
+                    text: TextSpan(
+                      style: const TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2.5,
+                        fontFamily: 'Kola',
+                      ),
+                      children: [
+                        TextSpan(
+                          text: 'Lo',
+                          style: TextStyle(
+                            color: looliFourth,
+                            fontFamily: 'Kola',
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'oli',
+                          style: TextStyle(
+                            color: looliFirst,
+                            fontFamily: 'Kola',
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(height: 20.h),
@@ -102,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
                   label: 'Enter your Name',
                   controller: _nameController,
                 ),
-    
+
                 // Email field
                 FieldLabel(label: 'Email'),
                 SizedBox(height: 6.h),
@@ -110,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
                   label: 'Enter your Email',
                   controller: _emailController,
                 ),
-    
+
                 // Password field
                 FieldLabel(label: 'Password'),
                 SizedBox(height: 6.h),
@@ -120,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
                   controller: _passwordController,
                 ),
                 SizedBox(height: 10.h),
-    
+
                 // Create Account Button
                 SizedBox(
                   width: double.infinity,
@@ -162,9 +185,12 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: 5.h),
                 TextButton(
                   onPressed: () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(
-                      builder: (context) => const AuthLogin(),
-                    ));
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AuthLogin(),
+                      ),
+                    );
                   },
                   child: Text(
                     'Already a Loolian ?',
@@ -184,7 +210,10 @@ class _LoginPageState extends State<LoginPage> {
                       padding: EdgeInsets.symmetric(horizontal: 8.w),
                       child: Text(
                         'or',
-                        style: TextStyle(fontFamily: 'Poppins',color: looliFourth),
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          color: looliFourth,
+                        ),
                       ),
                     ),
                     const Expanded(child: Divider()),
@@ -193,18 +222,24 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: 15.h),
                 Text(
                   'Continue with',
-                  style: TextStyle(fontSize: 14.sp, fontFamily: 'Poppins',color: looliFourth),
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontFamily: 'Poppins',
+                    color: looliFourth,
+                  ),
                 ),
                 SizedBox(height: 10.h),
-    
+
                 // Google Button
                 GestureDetector(
-                  onTap: ()async {
+                  onTap: () async {
                     bool isLoggedIn = await login();
                     if (isLoggedIn) {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => const Homepage()),
+                        MaterialPageRoute(
+                          builder: (context) => const Homepage(),
+                        ),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -247,14 +282,16 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-Future<bool> login() async {
+
+  Future<bool> login() async {
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn();
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
         return false; // User cancelled the sign-in
       }
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,

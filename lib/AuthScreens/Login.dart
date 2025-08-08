@@ -18,44 +18,47 @@ class _AuthLoginState extends State<AuthLogin> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  void _createAccount()async {
+  void _createAccount() async {
     String mail = _emailController.text.trim();
     String password = _passwordController.text.trim();
-    if (mail.isEmpty ||password.isEmpty) {
+    if (mail.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill in all fields'),
-          backgroundColor: looliThird,
+          backgroundColor: looliFourth,
         ),
       );
       return;
-    }    else{
-      await FirebaseAuth.instance.signInWithEmailAndPassword(email:mail , password: password)
+    } else {
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: mail, password: password)
           .then((value) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Login Successful!'),
-            backgroundColor: Colors.deepOrangeAccent,
-          ),
-        );
-        Navigator.pushReplacement(context, MaterialPageRoute(
-          builder: (context) => const Homepage(),
-        ));
-      }).catchError((error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Check your email and password again!'),
-            backgroundColor: looliThird,
-          ),
-        );
-      });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Login Successful!'),
+                backgroundColor: looliFirst,
+              ),
+            );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const Homepage()),
+            );
+          })
+          .catchError((error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Check your email and password again!'),
+                backgroundColor: looliThird,
+              ),
+            );
+          });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: looliThird,
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: SingleChildScrollView(
@@ -65,10 +68,31 @@ class _AuthLoginState extends State<AuthLogin> {
               children: [
                 SizedBox(height: 30.h),
                 Center(
-                  child: Image.asset(
-                    'assets/icons/LooliText.png',
-                    width: 80.w,
-                    height: 80.h,
+                  child: RichText(
+                    text: TextSpan(
+                      style: const TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2.5,
+                        fontFamily: 'Kola',
+                      ),
+                      children: [
+                        TextSpan(
+                          text: 'Lo',
+                          style: TextStyle(
+                            color: looliFourth,
+                            fontFamily: 'Kola',
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'oli',
+                          style: TextStyle(
+                            color: looliFirst,
+                            fontFamily: 'Kola',
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(height: 20.h),
@@ -78,6 +102,7 @@ class _AuthLoginState extends State<AuthLogin> {
                     fontSize: 25.sp,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Poppins',
+                    color: looliFourth,
                   ),
                 ),
                 SizedBox(height: 30.h),
@@ -141,16 +166,19 @@ class _AuthLoginState extends State<AuthLogin> {
                 SizedBox(height: 5.h),
                 TextButton(
                   onPressed: () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(
-                      builder: (context) => const LoginPage(),
-                    ));
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginPage(),
+                      ),
+                    );
                   },
                   child: Text(
                     'Not a Loolian ?',
                     style: TextStyle(
                       fontSize: 14.sp,
                       fontFamily: 'Poppins',
-                      color: looliThird,
+                      color: looliFourth,
                     ),
                   ),
                 ),

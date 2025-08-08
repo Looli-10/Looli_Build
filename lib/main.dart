@@ -1,20 +1,24 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:looli_app/AuthScreens/RegOrLogin.dart';
 import 'package:looli_app/Models/playlist.dart';
 import 'package:looli_app/Models/songs.dart';
-import 'package:looli_app/services/MainNavigation.dart';
 import 'package:looli_app/services/playlist_service.dart';
 import 'package:looli_app/widgets/audio_manager.dart';
-
+import 'package:looli_app/services/MainNavigation.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: WidgetsBinding.instance);
 
+  await Firebase.initializeApp();
   await Hive.initFlutter();
+  await Hive.openBox('userBox');
   Hive.registerAdapter(SongAdapter());
   await Hive.openBox<Song>('queue_songs');
   await Hive.openBox('player_state');
@@ -29,7 +33,6 @@ Future<void> main() async {
     androidNotificationChannelName: 'Audio Playback',
     androidNotificationOngoing: true,
   );
-
 
   await PlayerManager().restoreLastPlayedSong();
 
@@ -48,10 +51,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    initialization();
+    _removeSplash();
   }
 
-  void initialization() async {
+  void _removeSplash() async {
     await Future.delayed(const Duration(seconds: 1));
     FlutterNativeSplash.remove();
   }
@@ -79,7 +82,23 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Looli',
-          home: MainNavigation(),
+          home: StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, snapshot) {
+              // While checking auth state
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              // If user is logged in
+              if (snapshot.hasData) {
+                return MainNavigation();
+              }
+
+              // If user is not logged in
+              return const LoginPage(); // or RegOrLogin if you want to give login/register choice
+            },
+          ),
         );
       },
     );
