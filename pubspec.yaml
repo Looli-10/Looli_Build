@@ -58,6 +58,9 @@ dependencies:
   connectivity_plus: ^6.1.4
   internet_connection_checker: ^3.0.1
   simple_waveform_progressbar: ^0.0.3
+  cloud_firestore: ^5.6.12
+  url_launcher: ^6.3.2
+  package_info_plus: ^8.3.0
 
 
 # flutter_native_splash: 
