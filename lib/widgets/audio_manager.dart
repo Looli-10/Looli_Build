@@ -141,8 +141,11 @@ class PlayerManager {
               }).toList(),
         );
 
-        await _player.setAudioSource(_audioSource!, initialIndex: index);
-        // 🟡 Do not auto-play on app launch
+        try {
+          await _player.setAudioSource(_audioSource!, initialIndex: index);
+        } catch (e) {
+          debugPrint("Error restoring last song: $e");
+        }
       }
     }
   }

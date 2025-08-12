@@ -8,6 +8,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:looli_app/AuthScreens/RegOrLogin.dart';
 import 'package:looli_app/Models/playlist.dart';
 import 'package:looli_app/Models/songs.dart';
+import 'package:looli_app/services/Sync_service.dart';
 import 'package:looli_app/services/playlist_service.dart';
 import 'package:looli_app/widgets/audio_manager.dart';
 import 'package:looli_app/services/MainNavigation.dart';
@@ -95,12 +96,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
-
               // If user is logged in
               if (snapshot.hasData) {
+                final userId = snapshot.data!.uid;
+                SyncService().initSync(userId);
                 return MainNavigation();
               }
-
               // If user is not logged in
               return const LoginPage(); // Or RegOrLogin
             },

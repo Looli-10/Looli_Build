@@ -27,20 +27,22 @@ class _MainNavigationState extends State<MainNavigation> {
   late List<Song> allSongs;
   late Map<String, String> artistImageMap;
 
+  bool _dataFetched = false; // Track if search data is fetched
+
   @override
   void initState() {
     super.initState();
-
     _connectivityService = ConnectivityService();
 
-    _connectivitySubscription = _connectivityService.connectivityStream.listen((connected) {
+    _connectivitySubscription =
+        _connectivityService.connectivityStream.listen((connected) {
       if (!connected && _isConnected != false) {
         _showOfflineSnackbar();
       }
 
-      // If just came back online and futures are not yet initialized, fetch data
-      if (connected && !_isConnected && (_songsFuture == null || _artistImagesFuture == null)) {
-        _initializeApp();
+      // If just came back online and data isn't fetched yet
+      if (connected && !_isConnected && !_dataFetched) {
+        _fetchSearchData();
       }
 
       setState(() {
@@ -48,23 +50,26 @@ class _MainNavigationState extends State<MainNavigation> {
       });
     });
 
-    _initializeApp(); // initial load
+    _initializeConnection();
+    _fetchSearchData(); // 🔹 Fetch immediately so BottomNav is ready
   }
 
-  Future<void> _initializeApp() async {
+  Future<void> _initializeConnection() async {
     final connected = await _connectivityService.checkConnection();
-
     setState(() {
       _isConnected = connected;
     });
+  }
 
-    if (connected) {
-      final songService = SongService();
-      setState(() {
-        _songsFuture = songService.fetchSongsFromGitHub();
-        _artistImagesFuture = songService.fetchArtistImageMap();
-      });
-    }
+  Future<void> _fetchSearchData() async {
+    if (!_isConnected) return;
+
+    final songService = SongService();
+    setState(() {
+      _songsFuture = songService.fetchSongsFromGitHub();
+      _artistImagesFuture = songService.fetchArtistImageMap();
+    });
+    _dataFetched = true;
   }
 
   @override
@@ -85,44 +90,18 @@ class _MainNavigationState extends State<MainNavigation> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    if (!_isConnected) {
-      return Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: Text(
-            "You're offline.\nPlease connect to the internet to load songs.",
-            style: const TextStyle(color: Colors.white, fontSize: 18),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
-
-    if (_songsFuture == null || _artistImagesFuture == null) {
-      return const Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(child: CircularProgressIndicator(color: Colors.white)),
-      );
-    }
-
+  Widget _buildSearchTab() {
     return FutureBuilder<List<Song>>(
       future: _songsFuture,
       builder: (context, songSnapshot) {
         if (songSnapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            backgroundColor: Colors.black,
-            body: Center(child: CircularProgressIndicator(color: Colors.white)),
-          );
+          return const Center(
+              child: CircularProgressIndicator(color: Colors.white));
         } else if (songSnapshot.hasError) {
-          return Scaffold(
-            backgroundColor: Colors.black,
-            body: Center(
-              child: Text(
-                "Error loading songs: ${songSnapshot.error}",
-                style: const TextStyle(color: Colors.white),
-              ),
+          return Center(
+            child: Text(
+              "Error loading songs: ${songSnapshot.error}",
+              style: const TextStyle(color: Colors.white),
             ),
           );
         }
@@ -133,54 +112,62 @@ class _MainNavigationState extends State<MainNavigation> {
           future: _artistImagesFuture,
           builder: (context, artistSnapshot) {
             if (artistSnapshot.connectionState == ConnectionState.waiting) {
-              return const Scaffold(
-                backgroundColor: Colors.black,
-                body: Center(child: CircularProgressIndicator(color: Colors.white)),
-              );
+              return const Center(
+                  child: CircularProgressIndicator(color: Colors.white));
             } else if (artistSnapshot.hasError) {
-              return Scaffold(
-                backgroundColor: Colors.black,
-                body: Center(
-                  child: Text(
-                    "Error loading artist images: ${artistSnapshot.error}",
-                    style: const TextStyle(color: Colors.white),
-                  ),
+              return Center(
+                child: Text(
+                  "Error loading artist images: ${artistSnapshot.error}",
+                  style: const TextStyle(color: Colors.white),
                 ),
               );
             }
 
             artistImageMap = artistSnapshot.data ?? {};
 
-            return Scaffold(
-              backgroundColor: looliThird,
-              body: IndexedStack(
-                index: _currentIndex,
-                children: [
-                  const Homepage(),
-                  SearchPage(
-                    allSongs: allSongs,
-                    artistImageMap: artistImageMap,
-                    onBackToHome: () {
-                      setState(() {
-                        _currentIndex = 0;
-                      });
-                    },
-                  ),
-                  const LibraryPage(),
-                ],
-              ),
-              bottomNavigationBar: BottomNavBar(
-                currentIndex: _currentIndex,
-                onTap: (index) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
-                },
-              ),
+            return SearchPage(
+              allSongs: allSongs,
+              artistImageMap: artistImageMap,
+              onBackToHome: () {
+                setState(() {
+                  _currentIndex = 0;
+                });
+              },
             );
           },
         );
       },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: looliThird,
+      body: IndexedStack(
+        index: _currentIndex,
+        children: [
+          const Homepage(),
+          _isConnected
+              ? _buildSearchTab()
+              : const Center(
+                  child: Text(
+                    "You're offline.\nPlease connect to load songs.",
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+          const LibraryPage(),
+        ],
+      ),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+      ),
     );
   }
 }

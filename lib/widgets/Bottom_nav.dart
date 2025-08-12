@@ -22,7 +22,7 @@ Widget build(BuildContext context) {
     backgroundColor: Colors.transparent,
     color: looliFifth,
     height: 60,
-    animationDuration: const Duration(milliseconds: 300),
+    animationDuration: const Duration(milliseconds: 250),
     animationCurve: Curves.easeInOut,
     buttonBackgroundColor: looliFirst,
     items: List.generate(icons.length, (index) {

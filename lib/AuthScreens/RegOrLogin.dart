@@ -9,6 +9,7 @@ import 'package:looli_app/Constants/helper/Label.dart';
 import 'package:looli_app/Constants/Colors/app_colors.dart';
 import 'package:looli_app/AuthScreens/Login.dart';
 import 'package:looli_app/Screens/HomePage.dart';
+import 'package:looli_app/services/MainNavigation.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -238,7 +239,7 @@ class _LoginPageState extends State<LoginPage> {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const Homepage(),
+                          builder: (context) => MainNavigation(),
                         ),
                       );
                     } else {

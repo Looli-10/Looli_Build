@@ -6,6 +6,18 @@ import '../Models/playlist.dart';
 class SyncService {
   final _firestore = FirebaseFirestore.instance;
 
+  /// Call this after login to start syncing
+  Future<void> initSync(String userId) async {
+    // First merge from Firestore to local Hive
+    await syncSongs(userId);
+    await syncPlaylists(userId);
+
+    // Then watch local changes and push them to Firestore
+    _startWatchingSongs(userId);
+    _startWatchingPlaylists(userId);
+  }
+
+  /// Merge liked songs between Firestore and Hive
   Future<void> syncSongs(String userId) async {
     final songBox = Hive.box<Song>('liked_songs');
 
@@ -43,6 +55,7 @@ class SyncService {
     }
   }
 
+  /// Merge custom playlists between Firestore and Hive
   Future<void> syncPlaylists(String userId) async {
     final playlistBox = Hive.box<Playlist>('custom_playlists');
 
@@ -80,7 +93,39 @@ class SyncService {
     }
   }
 
-  // Generic merge by ID
+  /// Watch liked songs box and push updates to Firestore
+  void _startWatchingSongs(String userId) {
+    final songBox = Hive.box<Song>('liked_songs');
+    songBox.watch().listen((event) async {
+      final song = songBox.get(event.key);
+      if (song != null) {
+        await _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('songs')
+            .doc(song.id)
+            .set(song.toJson(), SetOptions(merge: true));
+      }
+    });
+  }
+
+  /// Watch playlists box and push updates to Firestore
+  void _startWatchingPlaylists(String userId) {
+    final playlistBox = Hive.box<Playlist>('custom_playlists');
+    playlistBox.watch().listen((event) async {
+      final playlist = playlistBox.get(event.key);
+      if (playlist != null) {
+        await _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('playlists')
+            .doc(playlist.id)
+            .set(playlist.toJson(), SetOptions(merge: true));
+      }
+    });
+  }
+
+  /// Generic merge by ID
   List<T> _mergeById<T>(
     List<T> local,
     List<T> remote,
@@ -93,7 +138,7 @@ class SyncService {
       mergedMap[getId(item)] = item;
     }
 
-    // Add remote (overwrites only if not present locally)
+    // Add remote only if not present locally
     for (var item in remote) {
       mergedMap.putIfAbsent(getId(item), () => item);
     }

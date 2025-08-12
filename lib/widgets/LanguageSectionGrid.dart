@@ -17,6 +17,7 @@ class LanguageSectionGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final Map<String, List<Song>> languageGroups = {};
 
+    // Group songs by language
     for (var lang in languageColorMap.keys) {
       final matchedSongs = allSongs
           .where((song) => song.language.toLowerCase() == lang.toLowerCase())
@@ -27,6 +28,7 @@ class LanguageSectionGrid extends StatelessWidget {
       }
     }
 
+    // Limit to first 6 languages
     final limitedLanguages = languageGroups.entries.take(6).toList();
 
     return Column(
@@ -44,88 +46,84 @@ class LanguageSectionGrid extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(
-          height: 250, // Height to fit approx 2 rows with spacing
-          child: GridView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            physics: NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: limitedLanguages.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,       // 2 items per row
-              mainAxisSpacing: 14,     // vertical spacing between rows
-              crossAxisSpacing: 14,    // horizontal spacing between columns
-              childAspectRatio: 170 / 140, // width / height ratio of each item
-            ),
-            itemBuilder: (context, index) {
-              final entry = limitedLanguages[index];
-              final lang = entry.key;
-              final color = hexToColor(languageColorMap[lang]!);
+        // GridView inside Column with shrinkWrap
+        GridView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true, // Important: lets it size naturally
+          itemCount: limitedLanguages.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,       // 2 items per row
+            mainAxisSpacing: 14,     // vertical spacing between rows
+            crossAxisSpacing: 14,    // horizontal spacing between columns
+            childAspectRatio: 170 / 140, // width / height ratio of each item
+          ),
+          itemBuilder: (context, index) {
+            final entry = limitedLanguages[index];
+            final lang = entry.key;
+            final color = hexToColor(languageColorMap[lang]!);
 
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => LanguageAlbumsPage(
-                        language: lang,
-                        songs: entry.value,
-                      ),
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => LanguageAlbumsPage(
+                      language: lang,
+                      songs: entry.value,
                     ),
-                  );
-                },
-                child: Container(
-                  width: 170,
-                  height: 140,
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(7),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 6,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
                   ),
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(7),
-                            gradient: LinearGradient(
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                              colors: [
-                                Colors.black.withOpacity(0.5),
-                                Colors.transparent,
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Center(
-                        child: Text(
-                          lang,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Poppins',
-                            shadows: [
-                              Shadow(blurRadius: 2, color: Colors.black),
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(7),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 6,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(7),
+                          gradient: LinearGradient(
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                            colors: [
+                              Colors.black.withOpacity(0.5),
+                              Colors.transparent,
                             ],
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    Center(
+                      child: Text(
+                        lang,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins',
+                          shadows: [
+                            Shadow(blurRadius: 2, color: Colors.black),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ],
     );

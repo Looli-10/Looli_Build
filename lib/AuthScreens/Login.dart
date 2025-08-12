@@ -6,6 +6,7 @@ import 'package:looli_app/Constants/helper/Label.dart';
 import 'package:looli_app/Constants/Colors/app_colors.dart';
 import 'package:looli_app/AuthScreens/RegOrLogin.dart';
 import 'package:looli_app/Screens/HomePage.dart';
+import 'package:looli_app/services/MainNavigation.dart';
 
 class AuthLogin extends StatefulWidget {
   const AuthLogin({super.key});
@@ -41,7 +42,7 @@ class _AuthLoginState extends State<AuthLogin> {
             );
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const Homepage()),
+              MaterialPageRoute(builder: (context) =>  MainNavigation()),
             );
           })
           .catchError((error) {

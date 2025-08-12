@@ -72,59 +72,6 @@ class _HomepageState extends State<Homepage> {
     });
   }
 
-  // Widget _buildSidebar() {
-  //   return Drawer(
-  //     backgroundColor: Colors.black,
-  //     child: Column(
-  //       children: [
-  //         const SizedBox(height: 60),
-  //         CircleAvatar(
-  //           radius: 40,
-  //           backgroundImage:
-  //               _user?.photoURL != null
-  //                   ? NetworkImage(_user!.photoURL!)
-  //                   : const AssetImage('assets/images/default_profile.png')
-  //                       as ImageProvider,
-  //         ),
-  //         const SizedBox(height: 10),
-  //         Text(
-  //           _user?.displayName ?? "Looli User",
-  //           style: const TextStyle(
-  //             color: Colors.white,
-  //             fontSize: 18,
-  //             fontWeight: FontWeight.bold,
-  //             fontFamily: 'Poppins',
-  //           ),
-  //         ),
-  //         const SizedBox(height: 5),
-  //         Text(
-  //           _user?.email ?? "",
-  //           style: const TextStyle(
-  //             color: Colors.grey,
-  //             fontSize: 14,
-  //             fontFamily: 'Poppins',
-  //           ),
-  //         ),
-  //         const Spacer(),
-  //         ListTile(
-  //           leading: const Icon(Icons.logout, color: Colors.white),
-  //           title: const Text('Logout', style: TextStyle(color: Colors.white)),
-  //           onTap: () async {
-  //             await FirebaseAuth.instance.signOut();
-  //             // After logout, rebuild the UI and go to login screen
-  //             if (mounted) {
-  //               Navigator.of(context).pushReplacement(
-  //                 MaterialPageRoute(builder: (_) => const LoginPage()),
-  //               );
-  //             }
-  //           },
-  //         ),
-  //         const SizedBox(height: 20),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
@@ -135,134 +82,143 @@ class _HomepageState extends State<Homepage> {
     );
     return SafeArea(
       child: Scaffold(
-  backgroundColor: Colors.black26,
-  appBar: AppBar(
-    backgroundColor: Colors.transparent,
-    elevation: 0,
-    automaticallyImplyLeading: false,
-    centerTitle: true,
-    title: RichText(
-      text: TextSpan(
-        style: const TextStyle(
-          fontSize: 30,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 2.5,
-          fontFamily: 'Kola',
-        ),
-        children: [
-          TextSpan(text: 'Lo', style: TextStyle(color: looliFourth)),
-          TextSpan(text: 'oli', style: TextStyle(color: looliFirst)),
-        ],
-      ),
-    ),
-    actions: [
-      Padding(
-        padding: const EdgeInsets.only(right: 12.0),
-        child: Builder(
-          builder: (context) {
-            final userBox = Hive.box('userBox');
-            return ValueListenableBuilder(
-              valueListenable: userBox.listenable(),
-              builder: (context, box, _) {
-                final customImage = box.get('customImage');
-                final user = _user; // from your state
-
-                ImageProvider avatarImage = const AssetImage('assets/images/profile-user.png');
-
-                if (customImage != null) {
-                  avatarImage = MemoryImage(customImage);
-                } else if (user?.photoURL != null) {
-                  avatarImage = NetworkImage(user!.photoURL!);
-                }
-
-                return GestureDetector(
-                  onTap: () => Scaffold.of(context).openEndDrawer(),
-                  child: CircleAvatar(
-                    radius: 18,
-                    backgroundColor: Colors.white24,
-                    backgroundImage: avatarImage,
-                  ),
-                );
-              },
-            );
-          },
-        ),
-      ),
-    ],
-  ),
-
-  endDrawer: SidebarDrawer(user: _user),
-
-  body: isOffline
-      ? _buildOfflineScreen()
-      : FutureBuilder(
-          future: Future.wait([
-            _albumsFuture,
-            _songsFuture,
-            _themeImagesFuture,
-            _artistImagesFuture,
-            _languageColorMapFuture,
-          ]),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return _buildOfflineScreen(
-                error: snapshot.error.toString(),
-              );
-            }
-
-            final albums = snapshot.data![0] as List<Album>;
-            final songs = snapshot.data![1] as List<Song>;
-            final themeImages = snapshot.data![2] as Map<String, String>;
-            final artistImages = snapshot.data![3] as Map<String, String>;
-            final languageColorMap = snapshot.data![4] as Map<String, String>;
-
-            final latestAlbum = albums.first;
-            final randomAlbums = List<Album>.from(albums)..removeAt(0);
-            randomAlbums.shuffle();
-            final gridAlbums = randomAlbums.take(4).toList();
-
-            return Stack(
+        backgroundColor: Colors.black26,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+          title: RichText(
+            text: TextSpan(
+              style: const TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2.5,
+                fontFamily: 'Kola',
+              ),
               children: [
-                ListView(
-                  children: [
-                    RecentlyPlayedSection(allAlbums: albums, song: songs.first),
-                    const SizedBox(height: 10),
-                    LatestReleaseCard(album: latestAlbum),
-                    const SizedBox(height: 15),
-                    AlbumsGridSection(albums: gridAlbums, song: songs),
-                    const SizedBox(height: 30),
-                    ArtistAlbumCardSection(
-                      allSongs: songs,
-                      artistImageMap: artistImages,
-                    ),
-                    const SizedBox(height: 30),
-                    ThemeAlbumCardSection(
-                      allSongs: songs,
-                      themeImageMap: themeImages,
-                    ),
-                    const SizedBox(height: 30),
-                    _buildPlaylistSection(),
-                    const SizedBox(height: 30),
-                    LanguageSectionGrid(
-                      allSongs: songs,
-                      languageColorMap: languageColorMap,
-                    ),
-                  ],
-                ),
-                const Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: MiniPlayer(),
-                ),
+                TextSpan(text: 'Lo', style: TextStyle(color: looliFourth)),
+                TextSpan(text: 'oli', style: TextStyle(color: looliFirst)),
               ],
-            );
-          },
-        ),
-),
+            ),
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 12.0),
+              child: Builder(
+                builder: (context) {
+                  final userBox = Hive.box('userBox');
+                  return ValueListenableBuilder(
+                    valueListenable: userBox.listenable(),
+                    builder: (context, box, _) {
+                      final customImage = box.get('customImage');
+                      final user = _user; // from your state
 
+                      ImageProvider avatarImage = const AssetImage(
+                        'assets/images/profile-user.png',
+                      );
+
+                      if (customImage != null) {
+                        avatarImage = MemoryImage(customImage);
+                      } else if (user?.photoURL != null) {
+                        avatarImage = NetworkImage(user!.photoURL!);
+                      }
+
+                      return GestureDetector(
+                        onTap: () => Scaffold.of(context).openEndDrawer(),
+                        child: CircleAvatar(
+                          radius: 18,
+                          backgroundColor: Colors.white24,
+                          backgroundImage: avatarImage,
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+
+        endDrawer: SidebarDrawer(user: _user),
+
+        body:
+            isOffline
+                ? _buildOfflineScreen()
+                : FutureBuilder(
+                  future: Future.wait([
+                    _albumsFuture,
+                    _songsFuture,
+                    _themeImagesFuture,
+                    _artistImagesFuture,
+                    _languageColorMapFuture,
+                  ]),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return _buildOfflineScreen(
+                        error: snapshot.error.toString(),
+                      );
+                    }
+
+                    final albums = snapshot.data![0] as List<Album>;
+                    final songs = snapshot.data![1] as List<Song>;
+                    final themeImages =
+                        snapshot.data![2] as Map<String, String>;
+                    final artistImages =
+                        snapshot.data![3] as Map<String, String>;
+                    final languageColorMap =
+                        snapshot.data![4] as Map<String, String>;
+
+                    final latestAlbum = albums.first;
+                    final randomAlbums = List<Album>.from(albums)..removeAt(0);
+                    randomAlbums.shuffle();
+                    final gridAlbums = randomAlbums.take(4).toList();
+
+                    return Stack(
+                      children: [
+                        ListView(
+                          children: [
+                            RecentlyPlayedSection(
+                              allAlbums: albums,
+                              song: songs.first,
+                            ),
+                            const SizedBox(height: 10),
+                            LatestReleaseCard(album: latestAlbum),
+                            const SizedBox(height: 15),
+                            AlbumsGridSection(albums: gridAlbums, song: songs),
+                            const SizedBox(height: 30),
+                            ArtistAlbumCardSection(
+                              allSongs: songs,
+                              artistImageMap: artistImages,
+                            ),
+                            const SizedBox(height: 30),
+                            ThemeAlbumCardSection(
+                              allSongs: songs,
+                              themeImageMap: themeImages,
+                            ),
+                            const SizedBox(height: 30),
+                            _buildPlaylistSection(),
+                            const SizedBox(height: 30),
+                            LanguageSectionGrid(
+                              allSongs: songs,
+                              languageColorMap: languageColorMap,
+                            ),
+                            const SizedBox(height: 30),
+                          ],
+                        ),
+                        const Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          child: MiniPlayer(),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+      ),
     );
   }
 
