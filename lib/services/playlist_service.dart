@@ -3,7 +3,7 @@ import 'package:looli_app/Models/playlist.dart';
 import 'package:looli_app/Models/songs.dart';
 
 class PlaylistService {
-  static const String _boxName = 'custom_playlists'; // ✅ Match the box used elsewhere
+  static const String _boxName = 'custom_playlists';
 
   static Future<void> init() async {
     await Hive.openBox<Playlist>(_boxName);
@@ -16,38 +16,38 @@ class PlaylistService {
 
   static Future<void> addPlaylist(Playlist playlist) async {
     final box = Hive.box<Playlist>(_boxName);
-    await box.add(playlist);
+    await box.put(playlist.id, playlist);  // Use id as key
   }
 
-  static Future<void> updatePlaylist(int index, Playlist updatedPlaylist) async {
+  static Future<void> updatePlaylistById(String id, Playlist updatedPlaylist) async {
     final box = Hive.box<Playlist>(_boxName);
-    await box.putAt(index, updatedPlaylist);
+    await box.put(id, updatedPlaylist);
   }
 
-  static Future<void> deletePlaylist(int index) async {
+  static Future<void> deletePlaylistById(String id) async {
     final box = Hive.box<Playlist>(_boxName);
-    await box.deleteAt(index);
+    await box.delete(id);
   }
 
-  static Future<void> addSongToPlaylist(int index, Song song) async {
+  static Future<void> addSongToPlaylist(String playlistId, Song song) async {
     final box = Hive.box<Playlist>(_boxName);
-    final playlist = box.getAt(index);
+    final playlist = box.get(playlistId);
     if (playlist != null && !playlist.songs.any((s) => s.id == song.id)) {
       playlist.songs.add(song);
       await playlist.save();
     }
   }
 
-  static Future<void> removeSongFromPlaylist(int index, Song song) async {
+  static Future<void> removeSongFromPlaylist(String playlistId, Song song) async {
     final box = Hive.box<Playlist>(_boxName);
-    final playlist = box.getAt(index);
+    final playlist = box.get(playlistId);
     if (playlist != null) {
       playlist.songs.removeWhere((s) => s.id == song.id);
       await playlist.save();
     }
   }
-  static Box<Playlist> getBox() {
-  return Hive.box<Playlist>(_boxName);
-}
 
+  static Box<Playlist> getBox() {
+    return Hive.box<Playlist>(_boxName);
+  }
 }

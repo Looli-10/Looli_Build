@@ -13,9 +13,6 @@ import 'package:looli_app/services/playlist_service.dart';
 import 'package:looli_app/widgets/audio_manager.dart';
 import 'package:looli_app/services/MainNavigation.dart';
 
-// ✅ Import your update checker
-import 'package:looli_app/Constants/helper/update_checker.dart';
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: WidgetsBinding.instance);
@@ -56,9 +53,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _removeSplash();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      UpdateChecker.checkForUpdate(context);
-    });
   }
 
   void _removeSplash() async {

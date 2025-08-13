@@ -20,7 +20,7 @@ class PlaylistAdapter extends TypeAdapter<Playlist> {
       id: fields[0] as String?,
       name: fields[1] as String,
       songs: (fields[2] as List).cast<Song>(),
-      imagePath: fields[3] as String?,
+      imageUrl: fields[3] as String?,
     );
   }
 
@@ -35,7 +35,7 @@ class PlaylistAdapter extends TypeAdapter<Playlist> {
       ..writeByte(2)
       ..write(obj.songs)
       ..writeByte(3)
-      ..write(obj.imagePath);
+      ..write(obj.imageUrl);
   }
 
   @override

@@ -18,12 +18,10 @@ class _AddSongsToPlaylistPageState extends State<AddSongsToPlaylistPage> {
   List<Song> allSongs = [];
   List<Song> filteredSongs = [];
   final TextEditingController searchController = TextEditingController();
-  final TextEditingController nameController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    nameController.text = widget.playlist.name;
     fetchSongs();
     searchController.addListener(_onSearch);
   }
@@ -40,7 +38,9 @@ class _AddSongsToPlaylistPageState extends State<AddSongsToPlaylistPage> {
     final query = searchController.text.toLowerCase();
     setState(() {
       filteredSongs = allSongs
-          .where((s) => s.title.toLowerCase().contains(query) || s.artist.toLowerCase().contains(query))
+          .where((s) =>
+              s.title.toLowerCase().contains(query) ||
+              s.artist.toLowerCase().contains(query))
           .toList();
     });
   }
@@ -56,10 +56,8 @@ class _AddSongsToPlaylistPageState extends State<AddSongsToPlaylistPage> {
   }
 
   Future<void> _saveChanges() async {
-    final newName = nameController.text.trim();
     final box = PlaylistService.getBox();
 
-    widget.playlist.name = newName;
     await widget.playlist.save(); // Save changes to the Hive object
 
     Navigator.pop(context); // Go back
@@ -72,7 +70,8 @@ class _AddSongsToPlaylistPageState extends State<AddSongsToPlaylistPage> {
       appBar: AppBar(
         iconTheme: const IconThemeData(color: looliFourth),
         backgroundColor: looliThird,
-        title: const Text("Edit Playlist", style: TextStyle(color: Colors.white)),
+        title: Text(widget.playlist.name,
+            style: const TextStyle(color: Colors.white)),
         actions: [
           TextButton(
             onPressed: _saveChanges,
@@ -82,25 +81,9 @@ class _AddSongsToPlaylistPageState extends State<AddSongsToPlaylistPage> {
       ),
       body: Column(
         children: [
-          // Playlist name field
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: TextField(
-              controller: nameController,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: "Playlist name",
-                hintStyle: const TextStyle(color: Colors.white38),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                filled: true,
-                fillColor: Colors.white10,
-              ),
-            ),
-          ),
-
           // Search bar
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.all(12),
             child: TextField(
               controller: searchController,
               style: const TextStyle(color: Colors.white),
@@ -110,7 +93,8 @@ class _AddSongsToPlaylistPageState extends State<AddSongsToPlaylistPage> {
                 prefixIcon: const Icon(Icons.search, color: Colors.white38),
                 filled: true,
                 fillColor: Colors.white10,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
             ),
           ),
@@ -123,7 +107,8 @@ class _AddSongsToPlaylistPageState extends State<AddSongsToPlaylistPage> {
               itemCount: filteredSongs.length,
               itemBuilder: (context, index) {
                 final song = filteredSongs[index];
-                final isSelected = widget.playlist.songs.any((s) => s.id == song.id);
+                final isSelected =
+                    widget.playlist.songs.any((s) => s.id == song.id);
 
                 return ListTile(
                   leading: ClipRRect(
@@ -131,7 +116,8 @@ class _AddSongsToPlaylistPageState extends State<AddSongsToPlaylistPage> {
                     child: Image.network(song.image, width: 50, height: 50),
                   ),
                   title: Text(song.title, style: const TextStyle(color: Colors.white)),
-                  subtitle: Text(song.artist, style: const TextStyle(color: Colors.white54)),
+                  subtitle:
+                      Text(song.artist, style: const TextStyle(color: Colors.white54)),
                   trailing: Icon(
                     isSelected ? Icons.check_circle : Icons.add_circle_outline,
                     color: isSelected ? Colors.green : Colors.white30,

@@ -3,7 +3,6 @@ import 'package:hive/hive.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:looli_app/Constants/helper/update_checker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:looli_app/Screens/EditProfilePage.dart';
 
@@ -155,11 +154,7 @@ class _SidebarDrawerState extends State<SidebarDrawer> {
                 ),
                 title: const Text('Check for Updates',
                     style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  UpdateChecker.checkForUpdate(context);
-                },
               ),
-
               // Logout
               ListTile(
                 leading: const Icon(Icons.logout, color: Colors.white),

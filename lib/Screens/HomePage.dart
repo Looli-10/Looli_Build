@@ -267,9 +267,9 @@ class _HomepageState extends State<Homepage> {
                   margin: const EdgeInsets.only(right: 14),
                   decoration: BoxDecoration(
                     image:
-                        playlist.imagePath != null
+                        playlist.imageUrl != null
                             ? DecorationImage(
-                              image: FileImage(File(playlist.imagePath!)),
+                              image: FileImage(File(playlist.imageUrl!)),
                               fit: BoxFit.cover,
                             )
                             : const DecorationImage(

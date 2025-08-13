@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:looli_app/Constants/Colors/app_colors.dart';
 import 'package:looli_app/Models/songs.dart';
@@ -51,55 +50,58 @@ class _AlbumSongsPageState extends State<AlbumSongsPage> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                expandedHeight: 300,
-                pinned: true,
-                backgroundColor: Colors.black,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Navigator.pop(context),
-                ),
-                flexibleSpace: FlexibleSpaceBar(
-                  centerTitle: true,
-                  collapseMode: CollapseMode.parallax,
-                  title: Text(
-                    widget.albumTitle,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Poppins',
+          NestedScrollView(
+            headerSliverBuilder:
+                (context, innerBoxIsScrolled) => [
+                  SliverAppBar(
+                    expandedHeight: 300,
+                    pinned: true,
+                    backgroundColor: Colors.black,
+                    leading: IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () => Navigator.pop(context),
                     ),
-                  ),
-                  background: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Image.network(
-                        widget.songs.first.image,
-                        fit: BoxFit.cover,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black.withOpacity(0.8),
-                              Colors.transparent,
-                              Colors.black.withOpacity(0.9),
-                            ],
-                          ),
+                    flexibleSpace: FlexibleSpaceBar(
+                      centerTitle: true,
+                      collapseMode: CollapseMode.parallax,
+                      title: Text(
+                        widget.albumTitle,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins',
                         ),
                       ),
-                    ],
+                      background: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.network(
+                            widget.songs.first.image,
+                            fit: BoxFit.cover,
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.black.withOpacity(0.8),
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.9),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-
-              // Play button
-              SliverToBoxAdapter(
-                child: Padding(
+                ],
+            body: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                // Play button
+                Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                   child: Align(
                     alignment: Alignment.bottomCenter,
@@ -128,11 +130,9 @@ class _AlbumSongsPageState extends State<AlbumSongsPage> {
                     ),
                   ),
                 ),
-              ),
 
-              // Songs list
-              SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
+                // Songs list
+                ...List.generate(widget.songs.length, (index) {
                   final song = widget.songs[index];
                   return ValueListenableBuilder<Song?>(
                     valueListenable: _playerManager.currentSongNotifier,
@@ -201,15 +201,13 @@ class _AlbumSongsPageState extends State<AlbumSongsPage> {
                       );
                     },
                   );
-                }, childCount: widget.songs.length),
-              ),
+                }),
 
-              // Albums by artist section
-
-              // Inside your build method
-              if (albumsByArtist.isNotEmpty)
-                SliverToBoxAdapter(
-                  child: Padding(
+                // More albums by artist
+                if (albumsByArtist.isNotEmpty) ...[
+                  const Divider(color: Colors.white24, thickness: 0.8),
+                  const SizedBox(height: 12),
+                  Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16.0,
                       vertical: 12.0,
@@ -217,35 +215,26 @@ class _AlbumSongsPageState extends State<AlbumSongsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Divider(color: Colors.white24, thickness: 0.8),
-                        const SizedBox(height: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'More albums by',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Poppins',
-                              ),
-                            ),
-                            Text(
-                              mainArtist,
-                              style: const TextStyle(
-                                color: looliFirst,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Kola',
-                                letterSpacing: 2.5,
-                              ),
-                            ),
-                          ],
+                        const Text(
+                          'More albums by',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Poppins',
+                          ),
+                        ),
+                        Text(
+                          mainArtist,
+                          style: const TextStyle(
+                            color: looliFirst,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Kola',
+                            letterSpacing: 2.5,
+                          ),
                         ),
                         const SizedBox(height: 12),
-
-                        // 🔀 Shuffle and exclude current album
                         Builder(
                           builder: (context) {
                             final shuffledAlbumsByArtist = [
@@ -391,13 +380,13 @@ class _AlbumSongsPageState extends State<AlbumSongsPage> {
                       ],
                     ),
                   ),
-                ),
-
-              const SliverToBoxAdapter(child: SizedBox(height: 100)),
-            ],
+                ],
+                const SizedBox(height: 120), // extra space for MiniPlayer
+              ],
+            ),
           ),
 
-          // Mini player
+          // Mini Player pinned at bottom
           const Positioned(left: 0, right: 0, bottom: 0, child: MiniPlayer()),
         ],
       ),

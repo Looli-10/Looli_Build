@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:looli_app/Constants/Colors/app_colors.dart';
 import 'package:looli_app/Screens/AddSongsToPlaylistPage.dart';
+import 'package:looli_app/Screens/EditPlaylist.dart';
 import 'package:looli_app/Screens/PlaylistDetailPage.dart';
 import 'package:looli_app/services/liked_songs_service.dart';
 import 'package:looli_app/widgets/dialog_utils.dart';
@@ -179,13 +180,13 @@ class _LibraryPageState extends State<LibraryPage> {
                                   color: Colors.white12,
                                 ),
                                 child:
-                                    playlist.imagePath != null
+                                    playlist.imageUrl != null
                                         ? ClipRRect(
                                           borderRadius: BorderRadius.circular(
                                             8,
                                           ),
                                           child: Image.file(
-                                            File(playlist.imagePath!),
+                                            File(playlist.imageUrl!),
                                             fit: BoxFit.cover,
                                           ),
                                         )
@@ -219,9 +220,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                       context,
                                       MaterialPageRoute(
                                         builder:
-                                            (_) => AddSongsToPlaylistPage(
-                                              playlist: playlist,
-                                            ),
+                                            (_) => EditPlaylist(playlist: playlist)
                                       ),
                                     );
                                   } else if (value == 'delete') {

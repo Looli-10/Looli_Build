@@ -94,13 +94,13 @@ class _PlaylistDetailPageState extends State<PlaylistDetailPage> {
           ),
 
           /// 🎵 Playlist Cover Image (if available)
-          if (widget.playlist.imagePath != null)
+          if (widget.playlist.imageUrl != null)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.file(
-                  File(widget.playlist.imagePath!),
+                  File(widget.playlist.imageUrl!),
                   width: 200,
                   height: 200,
                   fit: BoxFit.cover,

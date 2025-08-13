@@ -76,7 +76,7 @@ class _CreatePlaylistPageState extends State<CreatePlaylistPage> {
     final playlist = Playlist(
       name: name,
       songs: _selectedSongs,
-      imagePath: _pickedImage?.path,
+    imageUrl: _pickedImage?.path,
     );
     final box = Hive.box<Playlist>('custom_playlists');
     await box.add(playlist);

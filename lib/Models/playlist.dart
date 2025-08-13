@@ -7,7 +7,7 @@ part 'playlist.g.dart';
 @HiveType(typeId: 2)
 class Playlist extends HiveObject {
   @HiveField(0)
-  String id; // 🎯 Unique ID for sync
+  String id; // Unique ID
 
   @HiveField(1)
   String name;
@@ -15,15 +15,16 @@ class Playlist extends HiveObject {
   @HiveField(2)
   List<Song> songs;
 
+  // Firebase Storage URL
   @HiveField(3)
-  String? imagePath;
+  String? imageUrl;
 
   Playlist({
     String? id,
     required this.name,
     required this.songs,
-    this.imagePath,
-  }) : id = id ?? const Uuid().v4(); // auto-generate if not provided
+    this.imageUrl,
+  }) : id = id ?? const Uuid().v4();
 
   factory Playlist.fromJson(Map<String, dynamic> json) {
     return Playlist(
@@ -32,7 +33,7 @@ class Playlist extends HiveObject {
       songs: (json['songs'] as List<dynamic>? ?? [])
           .map((songJson) => Song.fromJson(Map<String, dynamic>.from(songJson)))
           .toList(),
-      imagePath: json['imagePath'],
+      imageUrl: json['imageUrl'],
     );
   }
 
@@ -41,7 +42,7 @@ class Playlist extends HiveObject {
       'id': id,
       'name': name,
       'songs': songs.map((s) => s.toJson()).toList(),
-      'imagePath': imagePath,
+      'imageUrl': imageUrl,
     };
   }
 }
