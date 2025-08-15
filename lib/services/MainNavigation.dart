@@ -7,6 +7,7 @@ import 'package:looli_app/Screens/SearchPage.dart';
 import 'package:looli_app/Screens/LibraryPage.dart';
 import 'package:looli_app/services/song_service.dart';
 import 'package:looli_app/services/connectivity_service.dart';
+import 'package:looli_app/services/updateapp.dart';
 import 'package:looli_app/widgets/Bottom_nav.dart';
 
 class MainNavigation extends StatefulWidget {
@@ -32,10 +33,14 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   void initState() {
     super.initState();
+    Future.delayed(const Duration(milliseconds: 500), () {
+      UpdateChecker.checkForUpdates(context);
+    });
     _connectivityService = ConnectivityService();
 
-    _connectivitySubscription =
-        _connectivityService.connectivityStream.listen((connected) {
+    _connectivitySubscription = _connectivityService.connectivityStream.listen((
+      connected,
+    ) {
       if (!connected && _isConnected != false) {
         _showOfflineSnackbar();
       }
@@ -96,7 +101,8 @@ class _MainNavigationState extends State<MainNavigation> {
       builder: (context, songSnapshot) {
         if (songSnapshot.connectionState == ConnectionState.waiting) {
           return const Center(
-              child: CircularProgressIndicator(color: Colors.white));
+            child: CircularProgressIndicator(color: Colors.white),
+          );
         } else if (songSnapshot.hasError) {
           return Center(
             child: Text(
@@ -113,7 +119,8 @@ class _MainNavigationState extends State<MainNavigation> {
           builder: (context, artistSnapshot) {
             if (artistSnapshot.connectionState == ConnectionState.waiting) {
               return const Center(
-                  child: CircularProgressIndicator(color: Colors.white));
+                child: CircularProgressIndicator(color: Colors.white),
+              );
             } else if (artistSnapshot.hasError) {
               return Center(
                 child: Text(
@@ -151,12 +158,12 @@ class _MainNavigationState extends State<MainNavigation> {
           _isConnected
               ? _buildSearchTab()
               : const Center(
-                  child: Text(
-                    "You're offline.\nPlease connect to load songs.",
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                    textAlign: TextAlign.center,
-                  ),
+                child: Text(
+                  "You're offline.\nPlease connect to load songs.",
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                  textAlign: TextAlign.center,
                 ),
+              ),
           const LibraryPage(),
         ],
       ),

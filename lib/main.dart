@@ -34,7 +34,6 @@ Future<void> main() async {
     androidNotificationChannelName: 'Audio Playback',
     androidNotificationOngoing: true,
   );
-
   await PlayerManager().restoreLastPlayedSong();
 
   runApp(const MyApp());
