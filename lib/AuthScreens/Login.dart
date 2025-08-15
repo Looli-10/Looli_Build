@@ -5,7 +5,6 @@ import 'package:looli_app/Constants/helper/Gradient.dart';
 import 'package:looli_app/Constants/helper/Label.dart';
 import 'package:looli_app/Constants/Colors/app_colors.dart';
 import 'package:looli_app/AuthScreens/RegOrLogin.dart';
-import 'package:looli_app/Screens/HomePage.dart';
 import 'package:looli_app/services/MainNavigation.dart';
 
 class AuthLogin extends StatefulWidget {

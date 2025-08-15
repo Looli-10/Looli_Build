@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import 'package:looli_app/Models/playlist.dart';
 import 'package:looli_app/Models/songs.dart';
 import 'package:looli_app/services/Sync_service.dart';
 import 'package:looli_app/services/playlist_service.dart';
+import 'package:looli_app/services/updateapp.dart';
 import 'package:looli_app/widgets/audio_manager.dart';
 import 'package:looli_app/services/MainNavigation.dart';
 
@@ -51,12 +53,19 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _removeSplash();
+    _initializeApp();
   }
 
-  void _removeSplash() async {
+  Future<void> _initializeApp() async {
+    // Wait for splash duration
     await Future.delayed(const Duration(seconds: 1));
     FlutterNativeSplash.remove();
+
+    // Check for updates after splash
+    await Future.delayed(const Duration(milliseconds: 500));
+    if (mounted) {
+      UpdateChecker.checkForUpdates(context);
+    }
   }
 
   @override
@@ -87,7 +96,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             builder: (context, snapshot) {
               // While checking auth state
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
               }
               // If user is logged in
               if (snapshot.hasData) {
